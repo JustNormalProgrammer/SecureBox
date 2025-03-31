@@ -1,4 +1,4 @@
-const { db } = require('../config/database');
+const db = require('../config/db/drizzleDB'); 
 
 class LoginEntry {
   static findByUserId(userId, callback) {

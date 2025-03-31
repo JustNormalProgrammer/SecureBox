@@ -18,13 +18,13 @@ router.get('/', authenticateToken, (req, res) => {
 
 router.get('/:user_id/files', authenticateToken, (req, res) => {
   const { user_id } = req.params;
-  if (user_id !== req.user.id) return res.status(403).json({ detail: 'Forbidden' });
+  if (Number(user_id) !== req.user.id) return res.status(403).json({ detail: 'Forbidden' });
   createUserFilesZip(user_id, res);
 });
 
 router.post('/:user_id/files', authenticateToken, async (req, res) => {
   const { user_id } = req.params;
-  if (user_id !== req.user.id) return res.status(403).json({ detail: 'Forbidden' });
+  if (Number(user_id) !== req.user.id) return res.status(403).json({ detail: 'Forbidden' });
   const { password, platform, login,logo } = req.body;
 
   try {
@@ -49,7 +49,7 @@ router.post('/:user_id/files', authenticateToken, async (req, res) => {
 
 router.put('/:user_id/passwords/:platform/:login', authenticateToken, async (req, res) => {
   const { user_id, platform, login } = req.params;
-  if (user_id !== req.user.id) return res.status(403).json({ detail: 'Forbidden' });
+  if (Number(user_id) !== req.user.id) return res.status(403).json({ detail: 'Forbidden' });
   const { new_password } = req.body;
 
   Password.findByUserPlatformLogin(user_id, platform, login, async (err, entry) => {
@@ -68,7 +68,7 @@ router.put('/:user_id/passwords/:platform/:login', authenticateToken, async (req
 
 router.delete('/:user_id/passwords/:platform/:login', authenticateToken, async (req, res) => {
   const { user_id, platform, login } = req.params;
-  if (user_id !== req.user.id) return res.status(403).json({ detail: 'Forbidden' });
+  if (Number(user_id) !== req.user.id) return res.status(403).json({ detail: 'Forbidden' });
 
   Password.findByUserPlatformLogin(user_id, platform, login, async (err, entry) => {
     if (err || !entry) return res.status(404).json({ detail: 'Password not found' });
@@ -86,7 +86,7 @@ router.delete('/:user_id/passwords/:platform/:login', authenticateToken, async (
 
 router.put('/:user_id/passwords', authenticateToken, async (req, res) => {
   const { user_id } = req.params;
-  if (user_id !== req.user.id) return res.status(403).json({ detail: 'Forbidden' });
+  if (Number(user_id) !== req.user.id) return res.status(403).json({ detail: 'Forbidden' });
   const { passwordsall } = req.body;
 
   Password.findByUserId(user_id, async (err, existingEntries) => {
