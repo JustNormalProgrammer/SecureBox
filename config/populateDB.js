@@ -2,7 +2,7 @@ const { Client } = require("pg");
 const fs = require("fs").promises;
 const path = require("path");
 const crypto = require("crypto");
-require("dotenv").config({path: path.join(__dirname, "..", ".env")});
+require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 
 const client = new Client({
   connectionString: `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DATABASE}`,
@@ -46,9 +46,9 @@ const initDB = async () => {
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
     `;
-    await client.query(createSQL);
-    return;
-}
+  await client.query(createSQL);
+  return;
+};
 
 async function addData() {
   const userId = "1";
@@ -102,7 +102,7 @@ async function main() {
   } catch (err) {
     console.error("Connection error", err.stack);
     await client.end();
-    return; 
+    return;
   }
   console.log("Creating tables...");
   await initDB();

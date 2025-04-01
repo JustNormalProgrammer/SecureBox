@@ -11,8 +11,11 @@ async function getLoginEntriesByUserId(userId) {
 }
 async function createLoginEntry({ userId, login, page }) {
   const timestamp = new Date().toISOString();
-  console.log(timestamp);
-  await db.insert(loginEntries).values({ userId, login, page, timestamp });
+  const result = await db
+    .insert(loginEntries)
+    .values({ userId, login, page, timestamp })
+    .returning();
+  return result;
 }
 
 module.exports = {

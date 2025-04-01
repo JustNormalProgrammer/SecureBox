@@ -36,7 +36,7 @@ async function upsertTrustedDevice({ userId, deviceId, userAgent, isTrusted }) {
   }
 }
 // returns device if it existed before deletion, otherwise returns []
-async function deleteTrustedDevice(userId, deviceId) {
+async function deleteTrustedDevice({ userId, deviceId }) {
   const result = await db
     .delete(trustedDevices)
     .where(

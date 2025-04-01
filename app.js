@@ -22,8 +22,6 @@ app.use(
 );
 app.use(express.json());
 
-
-
 app.use('/login', authRoutes);
 app.use('/users', userRoutes);
 app.use('/passwords', passwordRoutes);

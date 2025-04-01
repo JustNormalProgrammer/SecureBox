@@ -35,7 +35,7 @@ router.get(
   authenticateToken,
   asyncHandler(async (req, res) => {
     const { user_id } = req.params;
-    if (Number(user_id) !== req.user.id)
+    if (user_id !== req.user.id)
       return res.status(403).json({ detail: "Forbidden" });
     createUserFilesZip(user_id, res);
   })
@@ -48,8 +48,7 @@ router.post(
     const { user_id: userId } = req.params;
     const { password, platform, login, logo } = req.body;
     try {
-      if (Number(userId) !== req.user.id)
-        throw new CustomError("Frobidden", 403);
+      if (userId !== req.user.id) throw new CustomError("Frobidden", 403);
       const filename = await createPasswordFile(userId, password);
       const id = createPassword({
         passwordfile: filename,
@@ -66,7 +65,7 @@ router.post(
     }
   })
 );
-
+// creates new file after every valid request ???
 router.put(
   "/:user_id/passwords/:platform/:login",
   authenticateToken,
@@ -74,8 +73,7 @@ router.put(
     const { user_id: userId, platform, login } = req.params;
     const { new_password } = req.body;
     try {
-      if (Number(userId) !== req.user.id)
-        throw new CustomError("Frobidden", 403);
+      if (userId !== req.user.id) throw new CustomError("Frobidden", 403);
       const [loginCredentials] = await getPasswordByUserPlatformLogin(
         userId,
         platform,
@@ -108,8 +106,7 @@ router.delete(
   authenticateToken,
   asyncHandler(async (req, res) => {
     const { user_id: userId, platform, login } = req.params;
-    if (Number(userId) !== req.user.id)
-      throw new CustomError("Frobidden", 403);
+    if (userId !== req.user.id) throw new CustomError("Frobidden", 403);
     const [loginCredentials] = await getPasswordByUserPlatformLogin(
       userId,
       platform,
@@ -118,7 +115,7 @@ router.delete(
     if (!loginCredentials) {
       throw new CustomError("Password not found", 404);
     }
-    await deletePasswordFile(user_id, loginCredentials.passwordfile);
+    await deletePasswordFile(userId, loginCredentials.passwordfile);
     await deletePassword(userId, platform, login);
     res.json({ message: `Password for ${platform}/${login} deleted` });
   })
@@ -131,8 +128,7 @@ router.put(
     const { user_id: userId } = req.params;
     const { passwordsall } = req.body;
     try {
-      if (Number(userId) !== req.user.id)
-        throw new CustomError("Frobidden", 403);
+      if (userId !== req.user.id) throw new CustomError("Frobidden", 403);
       const passwords = await getPasswordByUserId(userId);
       if (passwords.length === 0) {
         throw new CustomError("No passwords found", 404);

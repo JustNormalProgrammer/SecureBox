@@ -14,8 +14,8 @@ const {
 const {
   getTrustedDevicesByUserId,
   upsertTrustedDevice,
-  deleteTrustedDevice
-} = require("../config/db/queries/trustedDevice")
+  deleteTrustedDevice,
+} = require("../config/db/queries/trustedDevice");
 const asyncHandler = require("express-async-handler");
 const CustomError = require("../utils/customError");
 const fs = require("fs").promises;
@@ -50,7 +50,7 @@ router.patch(
   asyncHandler(async (req, res) => {
     const { user_id: userId } = req.params;
 
-    if (Number(userId) !== req.user.id) {
+    if (userId !== req.user.id) {
       return res.status(403).json({ detail: "Forbidden" });
     }
     const {
@@ -84,7 +84,7 @@ router.get(
   authenticateToken,
   asyncHandler(async (req, res) => {
     const { user_id: userId } = req.params;
-    if (Number(userId) !== req.user.id)
+    if (userId !== req.user.id)
       return res.status(403).json({ detail: "Forbidden" });
     try {
       const [user] = await getUserById(userId);
@@ -113,8 +113,7 @@ router.get(
   asyncHandler(async (req, res) => {
     const { user_id: userId } = req.params;
     try {
-      if (Number(userId) !== req.user.id)
-        throw new CustomError("Forbidden", 403);
+      if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
       const [user] = await getUserById(userId);
       if (!user) {
         throw new CustomError("User not found", 404);
@@ -126,17 +125,17 @@ router.get(
     }
   })
 );
-
+// check if login is already created
 router.post(
   "/:user_id/logins",
   authenticateToken,
   asyncHandler(async (req, res) => {
     const { user_id: userId } = req.params;
     try {
-      if (Number(userId) !== req.user.id)
-        throw new CustomError("Forbidden", 403);
+      if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
       const { login, page } = req.body;
-      await createLoginEntry({userId, login, page});
+      const result = await createLoginEntry({ userId, login, page });
+      return res.status(201).json(result);
     } catch (err) {
       return res.status(err.status || 500).json({ detail: err.message });
     }
@@ -148,13 +147,14 @@ router.get(
   authenticateToken,
   asyncHandler(async (req, res) => {
     const { user_id: userId } = req.params;
-    try{
-      if (Number(userId) !== req.user.id)
-        throw new CustomError("Forbidden", 403);
+    try {
+      if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
       const devices = await getTrustedDevicesByUserId(userId);
       res.json(devices.map((d) => ({ ...d, is_trusted: !!d.is_trusted })));
-    } catch(err) {
-      return res.status(err.status || 500).json({ detail: err.message || 'Something went wrong' });
+    } catch (err) {
+      return res
+        .status(err.status || 500)
+        .json({ detail: err.message || "Something went wrong" });
     }
   })
 );
@@ -164,13 +164,18 @@ router.patch(
   authenticateToken,
   asyncHandler(async (req, res) => {
     const { user_id: userId } = req.params;
-    const { device_id: deviceId, user_agent: userAgent, is_trusted: isTrusted } = req.body;
-    try{
-      if (Number(userId) !== req.user.id)
-        throw new CustomError("Forbidden", 403);
-      await upsertTrustedDevice({userId, deviceId, userAgent, isTrusted})
-    } catch(err){
-      return res.status(err.status || 500).json({ detail: err.message || 'Something went wrong' });
+    const {
+      device_id: deviceId,
+      user_agent: userAgent,
+      is_trusted: isTrusted,
+    } = req.body;
+    try {
+      if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
+      await upsertTrustedDevice({ userId, deviceId, userAgent, isTrusted });
+    } catch (err) {
+      return res
+        .status(err.status || 500)
+        .json({ detail: err.message || "Something went wrong" });
     }
   })
 );
@@ -179,16 +184,16 @@ router.delete(
   "/:user_id/trusted-devices/:device_id",
   authenticateToken,
   asyncHandler(async (req, res) => {
-    const { user_id:userId, device_id: deviceId } = req.params;
-    try{
-      if (Number(userId) !== req.user.id)
-        throw new CustomError("Forbidden", 403);
-      const result = await deleteTrustedDevice({userId, deviceId})
-      if(result.length === 0)
-        throw new CustomError("Device not found", 404)
-      res.json({ message: `Device ${device_id} removed from trusted devices` });
-    } catch (err){
-      return res.status(err.status || 500).json({ detail: err.message || 'Something went wrong' });
+    const { user_id: userId, device_id: deviceId } = req.params;
+    try {
+      if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
+      const result = await deleteTrustedDevice({ userId, deviceId });
+      if (!result) throw new CustomError("Device not found", 404);
+      res.json({ message: `Device ${deviceId} removed from trusted devices` });
+    } catch (err) {
+      return res
+        .status(err.status || 500)
+        .json({ detail: err.message || "Something went wrong" });
     }
   })
 );
