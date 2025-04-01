@@ -1,122 +1,186 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { authenticateToken } = require('../middleware/auth');
-const Password = require('../models/password');
+const { authenticateToken } = require("../middleware/auth");
+const Password = require("../models/password");
+const asyncHandler = require("express-async-handler");
+const CustomError = require("../utils/customError");
+const {
+  getPasswordByUserId,
+  createPassword,
+  getPasswordByUserPlatformLogin,
+  updatePassword,
+  deletePassword,
+} = require("../config/db/queries/password");
 const {
   createPasswordFile,
   updatePasswordFile,
   deletePasswordFile,
   createUserFilesZip,
-} = require('../utils/fileHandler');
+} = require("../utils/fileHandler");
 
-router.get('/', authenticateToken, (req, res) => {
-  Password.findByUserId(req.user.id, (err, passwords) => {
-    if (err) return res.status(500).json({ detail: err.message });
-    res.json(passwords);
-  });
-});
+router.get(
+  "/",
+  authenticateToken,
+  asyncHandler(async (req, res) => {
+    try {
+      const passwords = await getPasswordByUserId(req.user.id);
+      res.json(passwords);
+    } catch (err) {
+      return res.status(err.status || 500).json({ detail: err.message });
+    }
+  })
+);
 
-router.get('/:user_id/files', authenticateToken, (req, res) => {
-  const { user_id } = req.params;
-  if (Number(user_id) !== req.user.id) return res.status(403).json({ detail: 'Forbidden' });
-  createUserFilesZip(user_id, res);
-});
+router.get(
+  "/:user_id/files",
+  authenticateToken,
+  asyncHandler(async (req, res) => {
+    const { user_id } = req.params;
+    if (Number(user_id) !== req.user.id)
+      return res.status(403).json({ detail: "Forbidden" });
+    createUserFilesZip(user_id, res);
+  })
+);
 
-router.post('/:user_id/files', authenticateToken, async (req, res) => {
-  const { user_id } = req.params;
-  if (Number(user_id) !== req.user.id) return res.status(403).json({ detail: 'Forbidden' });
-  const { password, platform, login,logo } = req.body;
-
-  try {
-    const filename = await createPasswordFile(user_id, password);
-    const id = Password.create(
-      {
+router.post(
+  "/:user_id/files",
+  authenticateToken,
+  asyncHandler(async (req, res) => {
+    const { user_id: userId } = req.params;
+    const { password, platform, login, logo } = req.body;
+    try {
+      if (Number(userId) !== req.user.id)
+        throw new CustomError("Frobidden", 403);
+      const filename = await createPasswordFile(userId, password);
+      const id = createPassword({
         passwordfile: filename,
-        logo: 'https://img.freepik.com/darmowe-wektory/nowy-projekt-ikony-x-logo-twittera-2023_1017-45418.jpg?semt=ais_hybrid',
+        logo: "https://img.freepik.com/darmowe-wektory/nowy-projekt-ikony-x-logo-twittera-2023_1017-45418.jpg?semt=ais_hybrid",
         platform,
         login,
-        user_id,
-      },
-      (err) => {
-        if (err) return res.status(500).json({ detail: err.message });
-        res.status(201).json({ id, passwordfile: filename, logo, platform, login, user_id });
+        userId,
+      });
+      res
+        .status(201)
+        .json({ id, passwordfile: filename, logo, platform, login, userId });
+    } catch (err) {
+      return res.status(err.status || 500).json({ detail: err.message });
+    }
+  })
+);
+
+router.put(
+  "/:user_id/passwords/:platform/:login",
+  authenticateToken,
+  asyncHandler(async (req, res) => {
+    const { user_id: userId, platform, login } = req.params;
+    const { new_password } = req.body;
+    try {
+      if (Number(userId) !== req.user.id)
+        throw new CustomError("Frobidden", 403);
+      const [loginCredentials] = await getPasswordByUserPlatformLogin(
+        userId,
+        platform,
+        login
+      );
+      if (!loginCredentials) {
+        throw new CustomError("Password not found", 404);
       }
-    );
-  } catch (error) {
-    res.status(500).json({ detail: error.message });
-  }
-});
-
-router.put('/:user_id/passwords/:platform/:login', authenticateToken, async (req, res) => {
-  const { user_id, platform, login } = req.params;
-  if (Number(user_id) !== req.user.id) return res.status(403).json({ detail: 'Forbidden' });
-  const { new_password } = req.body;
-
-  Password.findByUserPlatformLogin(user_id, platform, login, async (err, entry) => {
-    if (err || !entry) return res.status(404).json({ detail: 'Password not found' });
-    try {
-      const newFilename = await updatePasswordFile(user_id, entry.passwordfile, new_password);
-      Password.update(entry.id, newFilename, (err) => {
-        if (err) return res.status(500).json({ detail: err.message });
-        res.json({ id: entry.id, passwordfile: newFilename, logo: entry.logo, platform, login, user_id });
+      const newFilename = await updatePasswordFile(
+        userId,
+        loginCredentials.passwordfile,
+        new_password
+      );
+      res.json({
+        id: loginCredentials.id,
+        passwordfile: newFilename,
+        logo: loginCredentials.logo,
+        platform,
+        login,
+        userId,
       });
-    } catch (error) {
-      res.status(500).json({ detail: error.message });
+    } catch (err) {
+      return res.status(err.status || 500).json({ detail: err.message });
     }
-  });
-});
+  })
+);
 
-router.delete('/:user_id/passwords/:platform/:login', authenticateToken, async (req, res) => {
-  const { user_id, platform, login } = req.params;
-  if (Number(user_id) !== req.user.id) return res.status(403).json({ detail: 'Forbidden' });
-
-  Password.findByUserPlatformLogin(user_id, platform, login, async (err, entry) => {
-    if (err || !entry) return res.status(404).json({ detail: 'Password not found' });
+router.delete(
+  "/:user_id/passwords/:platform/:login",
+  authenticateToken,
+  asyncHandler(async (req, res) => {
+    const { user_id: userId, platform, login } = req.params;
     try {
-      await deletePasswordFile(user_id, entry.passwordfile);
-      Password.delete(user_id, platform, login, (err) => {
-        if (err) return res.status(500).json({ detail: err.message });
-        res.json({ message: `Password for ${platform}/${login} deleted` });
-      });
-    } catch (error) {
-      res.status(500).json({ detail: error.message });
+      if (Number(userId) !== req.user.id)
+        throw new CustomError("Frobidden", 403);
+      const [loginCredentials] = await getPasswordByUserPlatformLogin(
+        userId,
+        platform,
+        login
+      );
+      if (!loginCredentials) {
+        throw new CustomError("Password not found", 404);
+      }
+      await deletePasswordFile(user_id, loginCredentials.passwordfile);
+      await deletePassword(userId, platform, login);
+      res.json({ message: `Password for ${platform}/${login} deleted` });
+    } catch (err) {
+      return res.status(err.status || 500).json({ detail: err.message });
     }
-  });
-});
+  })
+);
 
-router.put('/:user_id/passwords', authenticateToken, async (req, res) => {
-  const { user_id } = req.params;
-  if (Number(user_id) !== req.user.id) return res.status(403).json({ detail: 'Forbidden' });
-  const { passwordsall } = req.body;
-
-  Password.findByUserId(user_id, async (err, existingEntries) => {
-    if (err) return res.status(500).json({ detail: err.message });
-    if (!existingEntries.length) return res.status(404).json({ detail: 'No passwords found' });
-
-    const existingKeys = new Set(existingEntries.map((e) => `${e.platform}/${e.login}`));
-    const inputKeys = new Set(passwordsall.map((p) => `${p.platform}/${p.login}`));
-    if (existingKeys.size !== inputKeys.size || ![...existingKeys].every((k) => inputKeys.has(k))) {
-      return res.status(400).json({ detail: 'All accounts must be updated' });
-    }
-
+router.put(
+  "/:user_id/passwords",
+  authenticateToken,
+  asyncHandler(async (req, res) => {
+    const { user_id: userId } = req.params;
+    const { passwordsall } = req.body;
     try {
+      if (Number(userId) !== req.user.id)
+        throw new CustomError("Frobidden", 403);
+      const passwords = await getPasswordByUserId(userId);
+      if (passwords.length === 0) {
+        throw new CustomError("No passwords found", 404);
+      }
+      const existingKeys = new Set(
+        passwords.map((e) => `${e.platform}/${e.login}`)
+      );
+      const inputKeys = new Set(
+        passwordsall.map((p) => `${p.platform}/${p.login}`)
+      );
+      if (
+        existingKeys.size !== inputKeys.size ||
+        ![...existingKeys].every((k) => inputKeys.has(k))
+      ) {
+        throw new CustomError("All accounts must be updated", 400);
+      }
       const updatedEntries = [];
       for (const newPasswordData of passwordsall) {
         const { platform, login, new_password } = newPasswordData;
-        const entry = existingEntries.find((e) => e.platform === platform && e.login === login);
+        const entry = passwords.find(
+          (e) => e.platform === platform && e.login === login
+        );
         if (!entry) continue;
-
-        const newFilename = await updatePasswordFile(user_id, entry.passwordfile, new_password);
-        Password.update(entry.id, newFilename, (err) => {
-          if (err) throw err;
+        const newFilename = await updatePasswordFile(
+          userId,
+          entry.passwordfile,
+          new_password
+        );
+        await updatePassword(entry.id, newFilename);
+        updatedEntries.push({
+          id: entry.id,
+          passwordfile: newFilename,
+          logo: entry.logo,
+          platform,
+          login,
+          userId,
         });
-        updatedEntries.push({ id: entry.id, passwordfile: newFilename, logo: entry.logo, platform, login, user_id });
       }
       res.json(updatedEntries);
-    } catch (error) {
-      res.status(500).json({ detail: error.message });
+    } catch (err) {
+      return res.status(err.status || 500).json({ detail: err.message });
     }
-  });
-});
+  })
+);
 
 module.exports = router;

@@ -1,29 +1,37 @@
-const jwt = require('jsonwebtoken');
-const { db } = require('../config/database');
-
-const SECRET_KEY = 'your-secret-key';
+const jwt = require("jsonwebtoken");
+const { getUserById } = require("../config/db/queries/users");
+const SECRET_KEY = "your-secret-key";
 const TOKEN_EXPIRATION_MINUTES = 30;
 
-const authenticateToken = (req, res, next) => {
-  const token = req.headers['authorization']?.split(' ')[1];
-  if (!token) return res.status(401).json({ detail: 'No token provided' });
+const authenticateToken = async (req, res, next) => {
+  const token = req.headers["authorization"]?.split(" ")[1];
+  if (!token) return res.status(401).json({ detail: "No token provided" });
+  try {
+    const payload = jwt.verify(token, SECRET_KEY);
+    const [user] = await getUserById(payload.user_id);
 
-  jwt.verify(token, SECRET_KEY, (err, payload) => {
-    if (err) return res.status(401).json({ detail: 'Invalid or expired token' });
+    if (!user) {
+      return res.status(401).json({ detail: "User not found" });
+    }
+    // password in request - safe???
+    req.user = {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      login: user.login,
+      password: user.password,
+    };
 
-    const userId = payload.user_id;
-    db.get('SELECT * FROM users WHERE id = ?', [userId], (err, user) => {
-      if (err || !user) return res.status(401).json({ detail: 'User not found' });
-      req.user = {
-        id: user.id,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        login: user.login,
-        password: user.password,
-      };
-      next();
-    });
-  });
+    next();
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({ detail: "Token has expired" });
+    }
+    if (err.name === "JsonWebTokenError") {
+      return res.status(401).json({ detail: "Invalid token" });
+    }
+    return res.status(500).json({ detail: "Internal server error" });
+  }
 };
 
 module.exports = { authenticateToken, SECRET_KEY, TOKEN_EXPIRATION_MINUTES };
