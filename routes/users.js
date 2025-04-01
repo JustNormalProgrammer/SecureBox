@@ -31,10 +31,10 @@ router.post(
       password,
     } = req.body;
     const existingUser = await getUserByLoginAndPassword(login, password);
-    if (existingUser.length > 0) {
-      return res.status(400).json({ detail: "Login already exists" });
-    }
     try {
+      if (existingUser.length > 0) {
+        return res.status(400).json({ detail: "Login already exists" });
+      }
       const id = await createUser({ firstName, lastName, login, password });
       await fs.mkdir(path.join("files", id), { recursive: true });
       res.status(201).json({ id, firstName, lastName, login });
@@ -79,7 +79,6 @@ router.patch(
     }
   })
 );
-
 router.get(
   "/:user_id",
   authenticateToken,

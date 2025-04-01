@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const { initDB, populateInitialData } = require('./config/database');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const passwordRoutes = require('./routes/passwords');
@@ -23,12 +22,15 @@ app.use(
 );
 app.use(express.json());
 
-initDB();
-populateInitialData();
+
 
 app.use('/login', authRoutes);
 app.use('/users', userRoutes);
 app.use('/passwords', passwordRoutes);
+
+app.use((err, req, res, next) => {
+  return res.status(err.statusCode || 500).json({ detail: err.message || 'Internal server error' });
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
