@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const { authenticateToken } = require("../middleware/auth");
-const Password = require("../models/password");
 const asyncHandler = require("express-async-handler");
 const CustomError = require("../utils/customError");
 const {
@@ -109,23 +108,19 @@ router.delete(
   authenticateToken,
   asyncHandler(async (req, res) => {
     const { user_id: userId, platform, login } = req.params;
-    try {
-      if (Number(userId) !== req.user.id)
-        throw new CustomError("Frobidden", 403);
-      const [loginCredentials] = await getPasswordByUserPlatformLogin(
-        userId,
-        platform,
-        login
-      );
-      if (!loginCredentials) {
-        throw new CustomError("Password not found", 404);
-      }
-      await deletePasswordFile(user_id, loginCredentials.passwordfile);
-      await deletePassword(userId, platform, login);
-      res.json({ message: `Password for ${platform}/${login} deleted` });
-    } catch (err) {
-      return res.status(err.status || 500).json({ detail: err.message });
+    if (Number(userId) !== req.user.id)
+      throw new CustomError("Frobidden", 403);
+    const [loginCredentials] = await getPasswordByUserPlatformLogin(
+      userId,
+      platform,
+      login
+    );
+    if (!loginCredentials) {
+      throw new CustomError("Password not found", 404);
     }
+    await deletePasswordFile(user_id, loginCredentials.passwordfile);
+    await deletePassword(userId, platform, login);
+    res.json({ message: `Password for ${platform}/${login} deleted` });
   })
 );
 

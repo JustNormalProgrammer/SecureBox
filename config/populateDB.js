@@ -112,4 +112,4 @@ async function main() {
   console.log("Tables created, seed data added.");
 }
 
-module.exports = main;
+main();
