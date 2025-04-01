@@ -4,14 +4,13 @@ const SECRET_KEY = "your-secret-key";
 const TOKEN_EXPIRATION_MINUTES = 30;
 
 const authenticateToken = async (req, res, next) => {
-  const token = req.headers["authorization"]?.split(" ")[1];
-  if (!token) return res.status(401).json({ detail: "No token provided" });
   try {
+    const token = req.headers["authorization"]?.split(" ")[1];
+    if (!token) throw new CustomError("No token provided!", 401);
     const payload = jwt.verify(token, SECRET_KEY);
     const [user] = await getUserById(payload.user_id);
-
     if (!user) {
-      return res.status(401).json({ detail: "User not found" });
+      throw new CustomError("User not found", 401);
     }
     // password in request - safe???
     req.user = {
@@ -24,14 +23,9 @@ const authenticateToken = async (req, res, next) => {
 
     next();
   } catch (err) {
-    if (err.name === "TokenExpiredError") {
-      return res.status(401).json({ detail: "Token has expired" });
-    }
-    if (err.name === "JsonWebTokenError") {
-      return res.status(401).json({ detail: "Invalid token" });
-    }
-    return res.status(500).json({ detail: "Internal server error" });
+    next(err);
   }
 };
+
 
 module.exports = { authenticateToken, SECRET_KEY, TOKEN_EXPIRATION_MINUTES };
