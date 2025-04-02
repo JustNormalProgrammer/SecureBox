@@ -172,6 +172,7 @@ router.patch(
     try {
       if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
       await upsertTrustedDevice({ userId, deviceId, userAgent, isTrusted });
+      res.json({userId, deviceId, userAgent, isTrusted});
     } catch (err) {
       return res
         .status(err.status || 500)
