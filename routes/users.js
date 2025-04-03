@@ -6,6 +6,7 @@ const {
   getUserByLoginAndPassword,
   createUser,
   updateUser,
+  getUserByLogin,
 } = require("../config/db/queries/users");
 const {
   getLoginEntriesByUserId,
@@ -30,17 +31,12 @@ router.post(
       login,
       password,
     } = req.body;
-    const existingUser = await getUserByLoginAndPassword(login, password);
-    try {
-      if (existingUser.length > 0) {
-        return res.status(400).json({ detail: "Login already exists" });
-      }
-      const id = await createUser({ firstName, lastName, login, password });
-      await fs.mkdir(path.join("files", id), { recursive: true });
-      res.status(201).json({ id, firstName, lastName, login });
-    } catch (err) {
-      return res.status(err.status || 500).json({ detail: err.message });
-    }
+    const existingUser = await getUserByLogin(login);
+    if (existingUser.length > 0)
+      throw new CustomError("Login already exists", 400);
+    const id = await createUser({ firstName, lastName, login, password });
+    await fs.mkdir(path.join("files", id), { recursive: true });
+    res.status(201).json({ id, firstName, lastName, login });
   })
 );
 
@@ -50,33 +46,24 @@ router.patch(
   asyncHandler(async (req, res) => {
     const { user_id: userId } = req.params;
 
-    if (userId !== req.user.id) {
-      return res.status(403).json({ detail: "Forbidden" });
-    }
+    if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
     const {
       first_name: firstName,
       last_name: lastName,
       login,
       password,
     } = req.body;
-    try {
-      if (!firstName && !lastName && !login && !password) {
-        throw new CustomError("No fields to update", 400);
-      }
-      await updateUser(userId, { firstName, lastName, login, password });
-      const [user] = await getUserById(userId);
-      if (!user) {
-        throw new CustomError("User not found", 404);
-      }
-      res.json({
-        id: user.id,
-        first_name: user.firstName,
-        last_name: user.lastName,
-        login: user.login,
-      });
-    } catch (err) {
-      return res.status(err.status || 500).json({ detail: err.message });
-    }
+    if (!firstName && !lastName && !login && !password)
+      throw new CustomError("No fields to update", 400);
+    await updateUser(userId, { firstName, lastName, login, password });
+    const [user] = await getUserById(userId);
+    if (!user) throw new CustomError("User not found", 404);
+    res.json({
+      id: user.id,
+      first_name: user.firstName,
+      last_name: user.lastName,
+      login: user.login,
+    });
   })
 );
 router.get(
@@ -84,22 +71,15 @@ router.get(
   authenticateToken,
   asyncHandler(async (req, res) => {
     const { user_id: userId } = req.params;
-    if (userId !== req.user.id)
-      return res.status(403).json({ detail: "Forbidden" });
-    try {
-      const [user] = await getUserById(userId);
-      if (!user) {
-        throw new CustomError("User not found", 404);
-      }
-      res.json({
-        id: user.id,
-        first_name: user.firstName,
-        last_name: user.lastName,
-        login: user.login,
-      });
-    } catch (err) {
-      return res.status(err.status || 500).json({ detail: err.message });
-    }
+    if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
+    const [user] = await getUserById(userId);
+    if (!user) throw new CustomError("User not found", 404);
+    res.json({
+      id: user.id,
+      first_name: user.firstName,
+      last_name: user.lastName,
+      login: user.login,
+    });
   })
 );
 
@@ -112,17 +92,11 @@ router.get(
   authenticateToken,
   asyncHandler(async (req, res) => {
     const { user_id: userId } = req.params;
-    try {
-      if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
-      const [user] = await getUserById(userId);
-      if (!user) {
-        throw new CustomError("User not found", 404);
-      }
-      const loginEntries = await getLoginEntriesByUserId(userId);
-      res.json(loginEntries);
-    } catch (err) {
-      return res.status(err.status || 500).json({ detail: err.message });
-    }
+    if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
+    const [user] = await getUserById(userId);
+    if (!user) throw new CustomError("User not found", 404);
+    const loginEntries = await getLoginEntriesByUserId(userId);
+    res.json(loginEntries);
   })
 );
 // check if login is already created
@@ -131,14 +105,10 @@ router.post(
   authenticateToken,
   asyncHandler(async (req, res) => {
     const { user_id: userId } = req.params;
-    try {
-      if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
-      const { login, page } = req.body;
-      const result = await createLoginEntry({ userId, login, page });
-      return res.status(201).json(result);
-    } catch (err) {
-      return res.status(err.status || 500).json({ detail: err.message });
-    }
+    if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
+    const { login, page } = req.body;
+    const result = await createLoginEntry({ userId, login, page });
+    return res.status(201).json(result);
   })
 );
 
@@ -147,15 +117,9 @@ router.get(
   authenticateToken,
   asyncHandler(async (req, res) => {
     const { user_id: userId } = req.params;
-    try {
-      if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
-      const devices = await getTrustedDevicesByUserId(userId);
-      res.json(devices.map((d) => ({ ...d, is_trusted: !!d.is_trusted })));
-    } catch (err) {
-      return res
-        .status(err.status || 500)
-        .json({ detail: err.message || "Something went wrong" });
-    }
+    if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
+    const devices = await getTrustedDevicesByUserId(userId);
+    res.json(devices.map((d) => ({ ...d, is_trusted: !!d.is_trusted })));
   })
 );
 
@@ -169,15 +133,9 @@ router.patch(
       user_agent: userAgent,
       is_trusted: isTrusted,
     } = req.body;
-    try {
-      if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
-      await upsertTrustedDevice({ userId, deviceId, userAgent, isTrusted });
-      res.json({userId, deviceId, userAgent, isTrusted});
-    } catch (err) {
-      return res
-        .status(err.status || 500)
-        .json({ detail: err.message || "Something went wrong" });
-    }
+    if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
+    await upsertTrustedDevice({ userId, deviceId, userAgent, isTrusted });
+    res.json({ userId, deviceId, userAgent, isTrusted });
   })
 );
 
@@ -186,16 +144,10 @@ router.delete(
   authenticateToken,
   asyncHandler(async (req, res) => {
     const { user_id: userId, device_id: deviceId } = req.params;
-    try {
-      if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
-      const result = await deleteTrustedDevice({ userId, deviceId });
-      if (!result) throw new CustomError("Device not found", 404);
-      res.json({ message: `Device ${deviceId} removed from trusted devices` });
-    } catch (err) {
-      return res
-        .status(err.status || 500)
-        .json({ detail: err.message || "Something went wrong" });
-    }
+    if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
+    const result = await deleteTrustedDevice({ userId, deviceId });
+    if (!result) throw new CustomError("Device not found", 404);
+    res.json({ message: `Device ${deviceId} removed from trusted devices` });
   })
 );
 

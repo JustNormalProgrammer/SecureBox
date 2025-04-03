@@ -22,6 +22,14 @@ async function createUser({ firstName, lastName, login, password }) {
     .values({ id, firstName, lastName, login, password: hashedPassword });
   return id;
 }
+async function getUserByLogin(login) {
+  const user = await db
+    .select()
+    .from(users)
+    .where(eq(users.login, login))
+    .limit(1);
+  return user;
+}
 async function getUserByLoginAndPassword(login, password) {
   const hashedPassword = crypto
     .createHash("sha256")
@@ -52,4 +60,5 @@ module.exports = {
   createUser,
   getUserByLoginAndPassword,
   updateUser,
+  getUserByLogin,
 };
