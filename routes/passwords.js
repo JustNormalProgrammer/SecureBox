@@ -64,7 +64,7 @@ router.put(
   asyncHandler(async (req, res) => {
     const { user_id: userId, platform, login } = req.params;
     const { new_password } = req.body;
-    if (userId !== req.user.id) throw new CustomError("Frobidden", 403);
+    if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
     const [loginCredentials] = await getPasswordByUserPlatformLogin(
       userId,
       platform,
@@ -93,7 +93,7 @@ router.delete(
   authenticateToken,
   asyncHandler(async (req, res) => {
     const { user_id: userId, platform, login } = req.params;
-    if (userId !== req.user.id) throw new CustomError("Frobidden", 403);
+    if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
     const [loginCredentials] = await getPasswordByUserPlatformLogin(
       userId,
       platform,
@@ -112,7 +112,7 @@ router.put(
   asyncHandler(async (req, res) => {
     const { user_id: userId } = req.params;
     const { passwordsall } = req.body;
-    if (userId !== req.user.id) throw new CustomError("Frobidden", 403);
+    if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
     const passwords = await getPasswordByUserId(userId);
     if (passwords.length === 0)
       throw new CustomError("No passwords found", 404);
