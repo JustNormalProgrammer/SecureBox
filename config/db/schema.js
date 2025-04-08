@@ -62,6 +62,31 @@ exports.loginEntries = (0, pg.pgTable)(
     }).onDelete("cascade"),
   ]
 );
+exports.failedLogins = (0, pg.pgTable)(
+  "failed_logins",
+  {
+    id: (0, pg.integer)().primaryKey().generatedAlwaysAsIdentity({
+      name: "login_entries_id_seq",
+      startWith: 1,
+      increment: 1,
+      minValue: 1,
+      maxValue: 2147483647,
+      cache: 1,
+    }),
+    timestamp: (0, pg.timestamp)({
+      withTimezone: true,
+      mode: "string",
+    }).notNull(),
+    userId: (0, pg.text)("user_id").notNull()
+  },
+  (table) => [
+    (0, pg.foreignKey)({
+      columns: [table.userId],
+      foreignColumns: [exports.users.id],
+      name: "login_entries_user_id_fkey",
+    }).onDelete("cascade"),
+  ]
+);
 exports.trustedDevices = (0, pg.pgTable)(
   "trusted_devices",
   {

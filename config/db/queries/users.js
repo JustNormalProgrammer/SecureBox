@@ -1,6 +1,6 @@
 const db = require("../drizzleDB");
 const crypto = require("crypto");
-const { users,passwordResetTokens } = require("../schema");
+const { users,passwordResetTokens, failedLogins } = require("../schema");
 const { eq, and } = require("drizzle-orm");
 
 async function getUserById(userId) {
@@ -106,6 +106,21 @@ async function deleteResetToken(resetToken) {
   return deletedToken ? true : false;
 }
 
+async function getFailedByLogin(login){
+  const [user] = getUserByLogin(login);
+  if (!user) {
+    return [];
+  }
+  const failedAttempts = await db.select(
+    {
+      userId: failedLogins.userId,
+      timestamp: failedLogins.timestamp,
+    }
+  ).from(failedLogins).where(
+    eq(failedLogins.userId, user.id)
+  );
+  return failedAttempts;
+}
 
 module.exports = {
   getUserById,
