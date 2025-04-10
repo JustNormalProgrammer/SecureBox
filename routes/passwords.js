@@ -16,6 +16,20 @@ const {
   deletePasswordFile,
   createUserFilesZip,
 } = require("../utils/fileHandler");
+const { body, validationResult } = require("express-validator");
+
+const validateLoginCredentials = [
+  body("platform")
+    .trim()
+    .isLength({ min: 1, max: 50 })
+    .withMessage("Platform field cannot be empty and must not exceed 50 characters"),
+  body("login")
+    .trim()
+    .isLength({ min: 1, max: 50 })
+    .withMessage("Login field cannot be empty and must not exceed 50 characters"),
+  body("password").trim().isLength({min: 1}).withMessage("Password field cannot be empty"),
+];
+
 
 router.get(
   "/",
@@ -40,10 +54,14 @@ router.get(
 router.post(
   "/:user_id/files",
   authenticateToken,
+  validateLoginCredentials,
   asyncHandler(async (req, res) => {
     const { user_id: userId } = req.params;
     const { password, platform, login, logo } = req.body;
-    if (userId !== req.user.id) throw new CustomError("Frobidden", 403);
+    if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      throw new CustomError(errors.array().map(err => err.msg), 400);
     const filename = await createPasswordFile(userId, password);
     const id = await createPassword({
       passwordfile: filename,
@@ -61,10 +79,14 @@ router.post(
 router.put(
   "/:user_id/passwords/:platform/:login",
   authenticateToken,
+  body("new_password").trim().isLength({ min: 1 }).withMessage("New password field cannot be empty"),
   asyncHandler(async (req, res) => {
     const { user_id: userId, platform, login } = req.params;
     const { new_password } = req.body;
     if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
+    const errors = validationResult(req);
+    if(!errors.isEmpty())
+      throw new CustomError(errors.array().map(err => err.msg), 400);
     const [loginCredentials] = await getPasswordByUserPlatformLogin(
       userId,
       platform,
