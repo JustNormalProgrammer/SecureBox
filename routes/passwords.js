@@ -62,6 +62,14 @@ router.post(
     const errors = validationResult(req);
     if (!errors.isEmpty())
       throw new CustomError(errors.array().map(err => err.msg), 400);
+    const [existingPassword] = await getPasswordByUserPlatformLogin(
+      userId,
+      platform,
+      login
+    );
+    if (existingPassword) {
+      throw new CustomError("Password already exists", 400);
+    }
     const filename = await createPasswordFile(userId, password);
     const id = await createPassword({
       passwordfile: filename,
@@ -74,8 +82,7 @@ router.post(
       .status(201)
       .json({ id, passwordfile: filename, logo, platform, login, userId });
   })
-);
-// creates new file after every valid request ???
+)
 router.put(
   "/:user_id/passwords/:platform/:login",
   authenticateToken,
