@@ -9,6 +9,7 @@ async function getPasswordByUserId(userId) {
     .where(eq(passwords.userId, userId));
   return result;
 }
+
 async function createPassword({ passwordfile, logo, platform, login, userId }) {
   const id = crypto.randomUUID();
   await db

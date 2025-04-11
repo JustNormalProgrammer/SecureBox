@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { authenticateToken } = require("../middleware/auth");
 const asyncHandler = require("express-async-handler");
+const crypto = require("crypto");
 const CustomError = require("../utils/customError");
 const {
   getPasswordByUserId,
@@ -62,13 +63,15 @@ router.post(
     const errors = validationResult(req);
     if (!errors.isEmpty())
       throw new CustomError(errors.array().map(err => err.msg), 400);
-    const [existingPassword] = await getPasswordByUserPlatformLogin(
-      userId,
-      platform,
-      login
-    );
-    if (existingPassword) {
-      throw new CustomError("Password already exists", 400);
+    const passwords = await getPasswordByUserId(userId);
+    if(passwords){
+      const passwordFile = crypto
+          .createHash("sha256")
+          .update(password)
+          .digest("hex").slice(0, 8);
+      if(passwords.some(p => p.passwordfile === `${passwordFile}.txt`)){
+        throw new CustomError("Password already exists", 400);
+      }
     }
     const filename = await createPasswordFile(userId, password);
     const id = await createPassword({
