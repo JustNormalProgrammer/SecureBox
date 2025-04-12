@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { getUserById } = require("../config/db/queries/users");
-const SECRET_KEY = "your-secret-key";
+const SECRET_KEY = "dc247bbe619941e8d37e005b73c23cb180f5c47d237ed1d70acb661a7504a296";
 const TOKEN_EXPIRATION_MINUTES = 30;
 
 const authenticateToken = async (req, res, next) => {
@@ -13,7 +13,7 @@ const authenticateToken = async (req, res, next) => {
     if (!user) {
       return res.status(401).json({ detail: "User not found" });
     }
-    // password in request - safe???
+    
     req.user = {
       id: user.id,
       firstName: user.firstName,

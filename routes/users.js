@@ -26,7 +26,7 @@ const { body, validationResult } = require("express-validator");
 const validateUser = [
   body("first_name")
     .trim()
-    .isAlpha("pl-PL", {ignore: " -'"})
+    .isAlpha("pl-PL", { ignore: " -'" })
     .withMessage("First name must be a string")
     .isLength({ min: 1, max: 50 })
     .withMessage(
@@ -34,14 +34,18 @@ const validateUser = [
     ),
   body("last_name")
     .trim()
-    .isAlpha("pl-PL", {ignore: " -'"})
-    .withMessage("Last name must contain only letters except for space, - and ' characters")
+    .isAlpha("pl-PL", { ignore: " -'" })
+    .withMessage(
+      "Last name must contain only letters except for space, - and ' characters"
+    )
     .isLength({ min: 1, max: 50 })
     .withMessage("Last name cannot be empty and must not exceed 50 characters"),
   body("login")
     .trim()
     .isLength({ min: 1, max: 50 })
-    .withMessage("Login field cannot be empty and must not exceed 50 characters"),
+    .withMessage(
+      "Login field cannot be empty and must not exceed 50 characters"
+    ),
   body("password")
     .trim()
     .isStrongPassword({
@@ -56,16 +60,30 @@ const validateUser = [
     ),
 ];
 const validateLogin = [
-  body("login").trim().isLength({ min: 1, max: 50 }).withMessage("Login field cannot be empty and must not exceed 50 characters"),
-  body("page").trim().isLength({ min: 1, max: 50 }).withMessage("Page field cannot be empty and must not exceed 50 characters"),
-]
+  body("login")
+    .trim()
+    .isLength({ min: 1, max: 50 })
+    .withMessage(
+      "Login field cannot be empty and must not exceed 50 characters"
+    ),
+  body("page")
+    .trim()
+    .isLength({ min: 1, max: 50 })
+    .withMessage(
+      "Page field cannot be empty and must not exceed 50 characters"
+    ),
+];
 
 router.post(
   "/",
   validateUser,
   asyncHandler(async (req, res) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) throw new CustomError(errors.array().map(err => err.msg), 400);
+    if (!errors.isEmpty())
+      throw new CustomError(
+        errors.array().map((err) => err.msg),
+        400
+      );
     const {
       first_name: firstName,
       last_name: lastName,
@@ -89,7 +107,11 @@ router.patch(
     const { user_id: userId } = req.params;
     if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
     const errors = validationResult(req);
-    if (!errors.isEmpty()) throw new CustomError(errors.array().map(err => err.msg), 400);
+    if (!errors.isEmpty())
+      throw new CustomError(
+        errors.array().map((err) => err.msg),
+        400
+      );
     const {
       first_name: firstName,
       last_name: lastName,
@@ -140,14 +162,17 @@ router.get(
     res.json(loginEntries);
   })
 );
-// check if login is already created
 router.post(
   "/:user_id/logins",
   authenticateToken,
   validateLogin,
   asyncHandler(async (req, res) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) throw new CustomError(errors.array().map(err => err.msg), 400);
+    if (!errors.isEmpty())
+      throw new CustomError(
+        errors.array().map((err) => err.msg),
+        400
+      );
     const { user_id: userId } = req.params;
     if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
     const { login, page } = req.body;
