@@ -34,7 +34,7 @@ const deletePasswordFile = async (userId, passwordId) => {
   .createHash("sha256")
   .update(passwordId)
   .digest("hex");
-  const filePath = path.join("files", userId, `${passwordIdHah.slice(0, 8)}.txt`);
+  const filePath = path.join("files", userId, `${fileName.slice(0, 8)}.txt`);
   if (
     await fs
       .access(filePath)
