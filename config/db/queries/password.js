@@ -10,11 +10,11 @@ async function getPasswordByUserId(userId) {
   return result;
 }
 
-async function createPassword({ passwordfile, logo, platform, login, userId }) {
+async function createPassword({ logo, platform, login, userId }) {
   const id = crypto.randomUUID();
   await db
     .insert(passwords)
-    .values({ id, passwordfile, logo, platform, login, userId });
+    .values({ id, logo, platform, login, userId });
   return id;
 }
 async function getPasswordByUserPlatformLogin(userId, platform, login) {
@@ -30,9 +30,7 @@ async function getPasswordByUserPlatformLogin(userId, platform, login) {
     );
   return result;
 }
-async function updatePassword(id, passwordfile) {
-  await db.update(passwords).set({ passwordfile }).where(eq(passwords.id, id));
-}
+
 async function deletePassword(userId, platform, login) {
   const result = await db
     .delete(passwords)
@@ -51,6 +49,5 @@ module.exports = {
   getPasswordByUserId,
   createPassword,
   getPasswordByUserPlatformLogin,
-  updatePassword,
   deletePassword,
 };

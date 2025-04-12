@@ -21,7 +21,6 @@ exports.passwords = (0, pg.pgTable)(
   "passwords",
   {
     id: (0, pg.text)().primaryKey().notNull(),
-    passwordfile: (0, pg.text)().notNull(),
     logo: (0, pg.text)().notNull(),
     platform: (0, pg.text)().notNull(),
     login: (0, pg.text)().notNull(),
