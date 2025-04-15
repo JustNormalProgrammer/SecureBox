@@ -1,23 +1,25 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const passwordRoutes = require('./routes/passwords');
 
 const app = express();
 
+
 const allowedOrigins = [
   'http://localhost:5173',
   'chrome-extension://klaeffpcfgikkahmjkbjklejbifbcffi',
   'http://localhost:8000',
 ];
-
+app.use(helmet());
 app.use(
   cors({
     origin: allowedOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['*'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   })
 );
 app.use(express.json());

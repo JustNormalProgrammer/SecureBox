@@ -3,7 +3,6 @@ const router = express.Router();
 const { authenticateToken } = require("../middleware/auth");
 const {
   getUserById,
-  getUserByLoginAndPassword,
   createUser,
   updateUser,
   getUserByLogin,
@@ -22,12 +21,13 @@ const CustomError = require("../utils/customError");
 const fs = require("fs").promises;
 const path = require("path");
 const { body, validationResult } = require("express-validator");
+const { createUserFilesZip } = require("../utils/fileHandler");
 
 const validateUser = [
   body("first_name")
     .trim()
     .isAlpha("pl-PL", {ignore: " -'"})
-    .withMessage("First name must be a string")
+    .withMessage("First name must contain only letters except for space, - and ' characters ")
     .isLength({ min: 1, max: 50 })
     .withMessage(
       "First name cannot be empty and must not exceed 50 characters"
@@ -52,7 +52,7 @@ const validateUser = [
       minSymbols: 1,
     })
     .withMessage(
-      "Password field must be at least 8 characters long, contain at least one lowercase letter, uppercase letter, number and symbol"
+      "Password field must be at least 8 characters long, contain at least one lowercase letter, uppercase letter, number and a symbol"
     ),
 ];
 const validateLogin = [

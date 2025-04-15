@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const { authenticateToken } = require("../middleware/auth");
 const asyncHandler = require("express-async-handler");
-const crypto = require("crypto");
 const CustomError = require("../utils/customError");
 const {
   getPasswordByUserId,

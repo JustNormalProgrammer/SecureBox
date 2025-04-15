@@ -1,5 +1,5 @@
 const { drizzle } = require("drizzle-orm/node-postgres");
-const path = require("path");
+const path = require("node:path");
 require("dotenv").config({ path: path.join(__dirname, "../..", ".env") });
 const { users, passwords, loginEntries, trustedDevices } = require("./schema");
 
