@@ -1,6 +1,13 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
+/**
+ * Wysyła e-mail z linkiem do resetowania hasła.
+ * @param {string} to - Adres e-mail odbiorcy.
+ * @param {string} resetLink - Link do resetowania hasła.
+ * @returns {Promise<{ success: boolean, messageId: string }>} - Obiekt z informacją o sukcesie i ID wiadomości.
+ * @throws {Error} - W przypadku błędu podczas wysyłania e-maila.
+ */
 async function sendResetEmail(to, resetLink) {
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
