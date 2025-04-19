@@ -1,13 +1,13 @@
 const jwt = require("jsonwebtoken");
 const { getUserById } = require("../config/db/queries/users");
-const SECRET_KEY = "dc247bbe619941e8d37e005b73c23cb180f5c47d237ed1d70acb661a7504a296";
-const TOKEN_EXPIRATION_MINUTES = 30;
+
+require("dotenv").config();
 
 const authenticateToken = async (req, res, next) => {
   const token = req.headers["authorization"]?.split(" ")[1];
   if (!token) return res.status(401).json({ detail: "No token provided" });
   try {
-    const payload = jwt.verify(token, SECRET_KEY);
+    const payload = jwt.verify(token, process.env.SECRET_KEY);
     const [user] = await getUserById(payload.user_id);
 
     if (!user) {
@@ -34,4 +34,4 @@ const authenticateToken = async (req, res, next) => {
   }
 };
 
-module.exports = { authenticateToken, SECRET_KEY, TOKEN_EXPIRATION_MINUTES };
+module.exports = { authenticateToken, SECRET_KEY: process.env.SECRET_KEY, TOKEN_EXPIRATION_MINUTES: process.env.TOKEN_EXPIRATION_MINUTES };

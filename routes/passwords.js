@@ -63,6 +63,7 @@ router.post(
   asyncHandler(async (req, res) => {
     const { user_id: userId } = req.params;
     const { password, platform, login, logo } = req.body;
+    if (!/^[a-zA-Z0-9_-]+$/.test(userId)) throw new CustomError("Invalid user ID", 400);
     if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -99,6 +100,7 @@ router.put(
   asyncHandler(async (req, res) => {
     const { user_id: userId, platform, login } = req.params;
     const { new_password } = req.body;
+    if (!/^[a-zA-Z0-9_-]+$/.test(userId)) throw new CustomError("Invalid user ID", 400);
     if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
     const errors = validationResult(req);
     if (!errors.isEmpty())
@@ -133,6 +135,7 @@ router.delete(
   authenticateToken,
   asyncHandler(async (req, res) => {
     const { user_id: userId, platform, login } = req.params;
+    if (!/^[a-zA-Z0-9_-]+$/.test(userId)) throw new CustomError("Invalid user ID", 400);
     if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
     const [loginCredentials] = await getPasswordByUserPlatformLogin(
       userId,
@@ -152,10 +155,26 @@ router.put(
   asyncHandler(async (req, res) => {
     const { user_id: userId } = req.params;
     const { passwordsall } = req.body;
+    if (!/^[a-zA-Z0-9_-]+$/.test(userId)) throw new CustomError("Invalid user ID", 400);
     if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
     const passwords = await getPasswordByUserId(userId);
     if (passwords.length === 0)
       throw new CustomError("No passwords found", 404);
+    if (!Array.isArray(passwordsall)) {
+      throw new CustomError("passwordsall must be an array", 400);
+    }
+    for (const p of passwordsall) {
+      const isInvalid =
+        typeof p !== "object" ||
+        !p ||
+        typeof p.platform !== "string" ||
+        typeof p.login !== "string" ||
+        (p.new_password !== undefined && typeof p.new_password !== "string");
+    
+      if (isInvalid) {
+        throw new CustomError("Invalid password data format", 400);
+      }
+    }
     const existingKeys = new Set(
       passwords.map((e) => `${e.platform}/${e.login}`)
     );
