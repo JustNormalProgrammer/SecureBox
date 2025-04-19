@@ -1,5 +1,5 @@
 const db = require("../drizzleDB");
-const crypto = require("crypto");
+const crypto = require("node:crypto");
 const { users } = require("../schema");
 const { eq, and } = require("drizzle-orm");
 
