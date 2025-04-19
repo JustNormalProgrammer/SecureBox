@@ -81,3 +81,23 @@ exports.trustedDevices = (0, pg.pgTable)(
     }),
   ]
 );
+
+exports.passwordResetTokens = (0, pg.pgTable)(
+  "password_reset_tokens",
+  {
+    id: (0, pg.text)().primaryKey().notNull(),
+    userId: (0, pg.text)("user_id").notNull(),
+    token: (0, pg.text)().notNull(),
+    expiresAt: (0, pg.timestamp)({
+      withTimezone: true,
+      mode: "string",
+    }).notNull(),
+  },
+  (table) => [
+    (0, pg.foreignKey)({
+      columns: [table.userId],
+      foreignColumns: [exports.users.id],
+      name: "password_reset_tokens_user_id_fkey",
+    }).onDelete("cascade"),
+  ]
+);

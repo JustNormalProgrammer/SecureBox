@@ -1,10 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const { authenticateToken } = require("../middleware/auth");
+const { sendResetEmail } = require("../utils/emailUtils");
+const {generateResetToken} = require("../utils/tokenUtils");
 const {
   getUserById,
+  getUserByLoginAndPassword,
+  saveResetToken,
   createUser,
   updateUser,
+  deleteResetToken,
+  verifyResetToken,
   getUserByLogin,
 } = require("../config/db/queries/users");
 const {
@@ -162,6 +168,7 @@ router.get(
     res.json(loginEntries);
   })
 );
+
 router.post(
   "/:user_id/logins",
   authenticateToken,
@@ -219,5 +226,54 @@ router.delete(
     res.json({ message: `Device ${deviceId} removed from trusted devices` });
   })
 );
+
+
+
+router.post(
+  "/reset-password",
+  asyncHandler(async (req, res) => {
+    const { login } = req.body;
+
+    if (!login) {
+      throw new CustomError("Login jest wymagany", 400);
+    }
+
+    const existingUser = await getUserByLogin(login);
+    if (!existingUser || existingUser.length === 0) {
+      return res.status(200).json({ message: "Jeśli login istnieje, link resetujący został wysłany" });
+    }
+
+    const resetToken = generateResetToken();
+    await saveResetToken(existingUser[0].id, resetToken); 
+    const resetLink = `http://localhost:5173/reset-password/${resetToken}`;
+
+    await sendResetEmail(login, resetLink); 
+
+    res.status(200).json({ message: "Jeśli login istnieje, link resetujący został wysłany" });
+  })
+);
+
+
+
+router.post(
+  "/reset-password/confirm",
+  asyncHandler(async (req, res) => {
+    const { resetToken, newPassword } = req.body;
+
+    if (!resetToken || !newPassword) {
+      throw new CustomError("Token resetu i nowe hasło są wymagane", 400);
+    }
+
+    const user = await verifyResetToken(resetToken);
+    if (!user) {
+      throw new CustomError("Nieprawidłowy lub wygasły token resetu", 401);
+    }
+
+    await updateUser(user.id, { password: newPassword });
+    await deleteResetToken(resetToken);
+    res.status(200).json({ message: "Hasło zostało pomyślnie zmienione" });
+  })
+);
+
 
 module.exports = router;

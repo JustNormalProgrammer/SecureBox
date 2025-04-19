@@ -1,4 +1,4 @@
-# SecureBox
+# SecureBox - password manager
 
 ## Endpoints
 

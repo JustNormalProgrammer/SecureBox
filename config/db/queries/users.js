@@ -1,6 +1,6 @@
 const db = require("../drizzleDB");
 const crypto = require("node:crypto");
-const { users } = require("../schema");
+const { users,passwordResetTokens } = require("../schema");
 const { eq, and } = require("drizzle-orm");
 
 async function getUserById(userId) {
@@ -55,10 +55,65 @@ async function updateUser(id, { firstName, lastName, login, password }) {
   await db.update(users).set(updates).where(eq(users.id, id));
 }
 
+async function saveResetToken(userId, resetToken) {
+  const id = crypto.randomUUID();
+  const expiresAt = new Date(Date.now() + 60 * 60 * 10000);
+
+  await db.delete(passwordResetTokens).where(eq(passwordResetTokens.userId, userId));
+  await db.insert(passwordResetTokens).values({
+    id,
+    userId,
+    token: resetToken,
+    expiresAt,
+  });
+
+  return { id, userId, token: resetToken, expiresAt };
+}
+
+async function verifyResetToken(resetToken) {
+  const currentTime = new Date();
+
+  const [tokenRecord] = await db
+    .select({
+      id: passwordResetTokens.id,
+      userId: passwordResetTokens.userId,
+      token: passwordResetTokens.token,
+      expiresAt: passwordResetTokens.expiresAt,
+    })
+    .from(passwordResetTokens)
+    .where(eq(passwordResetTokens.token, resetToken))
+    .limit(1);
+
+  if (!tokenRecord || new Date(tokenRecord.expiresAt) < currentTime) {
+    return null;
+  }
+
+  const [user] = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, tokenRecord.userId))
+    .limit(1);
+
+  return user || null;
+}
+
+async function deleteResetToken(resetToken) {
+  const [deletedToken] = await db
+    .delete(passwordResetTokens)
+    .where(eq(passwordResetTokens.token, resetToken))
+    .returning({ id: passwordResetTokens.id });
+
+  return deletedToken ? true : false;
+}
+
+
 module.exports = {
   getUserById,
   createUser,
   getUserByLoginAndPassword,
   updateUser,
   getUserByLogin,
+  saveResetToken,
+  deleteResetToken,
+  verifyResetToken
 };
