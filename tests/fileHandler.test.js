@@ -2,75 +2,93 @@ const filehandler = require('../utils/fileHandler');
 const fs = require('fs');
 const path = require('path');
 const stream = require('stream');
-const { expect } = require('chai');
 const sinon = require('sinon');
+const archiver = require("archiver");
+
 
 let newDesiredFile;
 let desiredFile;
+let resMock;
+let archiveStub;
 
 describe('Testowanie funkcji fileHandler', function() {
   
-    before( function () {
-        const testDir = path.join(__dirname, '../files/1');
-        if (fs.existsSync(testDir)) {
-          fs.rmSync(testDir, { recursive: true, force: true });
-        }
-        fs.mkdirSync(testDir, { recursive: true });
-      });
+    
 
     it('1. Tworzenie pliku z hasłem', async function() {
-      await filehandler.createPasswordFile('1', 'haslo');
-      const desiredFile = path.join(__dirname, '../files/1/abe31fe1.txt');
-      expect(fs.existsSync(desiredFile)).to.be.true;
+      await filehandler.createPasswordFile('0', 'haslo');
+      desiredFile = path.join(__dirname, '../files/0/abe31fe1.txt');
+      expect(fs.existsSync(desiredFile)).toBe(true);
     });
   
     it('2. Aktualizacja pliku z hasłem', async function() {
-      newDesiredFile = path.join(__dirname, '../files/1/49673d1f.txt');
-      await filehandler.updatePasswordFile('1', 'abe31fe1.txt', 'nowehaslo');
-      filehandler.updatePasswordFile('1', 'abe31fe1.txt', 'nowehaslo');
-      expect(fs.existsSync(newDesiredFile)).to.be.true;
-      expect(fs.existsSync(desiredFile)).to.be.false;
+      newDesiredFile = path.join(__dirname, '../files/0/49673d1f.txt');
+      await filehandler.updatePasswordFile('0', 'abe31fe1.txt', 'nowehaslo');
+      expect(fs.existsSync(newDesiredFile)).toBe(true);
+      expect(fs.existsSync(desiredFile)).toBe(false);
     });
   
-    it('3. Usuwanie pliku z hasłem', async function() {
-      await filehandler.deletePasswordFile('1', '49673d1f.txt');
-      expect(fs.existsSync(newDesiredFile)).to.be.false;
+    it('3. Usuwanie pliku z hasłem', async() => {
+      await filehandler.deletePasswordFile('0', '49673d1f.txt');
+
+    let fileStillExists = true;
+    try {
+      await fs.promises.access(newDesiredFile);
+    } catch (err) {
+      fileStillExists = false;
+    }
+
+    expect(fileStillExists).toBe(false);
+
     });
   
-    it('4. Tworzenie pliku zip użytkownika', async function() {
-        const desiredZipPath = path.join(__dirname, '../files/1/user_1_files.zip');
-      
-        // Tworzymy "fałszywy" obiekt odpowiedzi (res)
-        const res = new stream.PassThrough();
-        res.attachment = sinon.spy();
-        res.status = sinon.stub().returns(res);
-        res.send = sinon.spy();
-      
-        const chunks = [];
-        res.on('data', (chunk) => chunks.push(chunk)); 
-        res.on('end', () => {
-          const buffer = Buffer.concat(chunks);
+    
+    beforeEach(() => {
+      // Tworzymy fake stream do response
+      resMock = {
+        attachment: sinon.stub(),
+        write: sinon.stub(),
+        end: sinon.stub()
+      };
+  
+      // Stub metody archiver: directory, pipe i finalize
+      archiveStub = {
+        directory: sinon.stub().returnsThis(),
+        pipe: sinon.stub(),
+        finalize: sinon.stub()
+      };
+  
+      // Zastępujemy wywołanie archiver() naszym stubem
+      sinon.stub(archiver, 'create').returns(archiveStub);
+    });
+  
+    afterEach(() => {
+      // Przywrócenie oryginalnych funkcji po każdym teście
+      sinon.restore();
+    });
+  
+    it('4. Tworzenie katalogu zip użytkownika', () => {
+  
+      filehandler.createUserFilesZip('0', resMock);
+  
+      const expectedPath = path.join('files', '0');
+      const expectedFilename = `user_0_files.zip`;
+  
+      sinon.assert.calledWith(resMock.attachment, expectedFilename);
+      sinon.assert.calledWith(archiveStub.pipe, resMock);
+      sinon.assert.calledWith(archiveStub.directory, expectedPath, false);
+      sinon.assert.calledOnce(archiveStub.finalize);
+    });
 
-
-          
-          expect(buffer.length).to.be.greaterThan(0);
-      
-          expect(res.attachment.calledWith('user_1_files.zip')).to.be.true;
-      
-          expect(fs.existsSync(desiredZipPath)).to.be.true;
-      
-        });
-      
-      });
-      
-
-    after(function () {
-      const testDir = path.join(__dirname, '../files/1');
-      if (fs.existsSync(testDir)) {
-        fs.rmSync(testDir, { recursive: true, force: true });
-        console.log('🧼 Usunięto katalog testowy:', testDir);
+    afterAll(async () => {
+      const folderPath = path.join(__dirname, '../files/0');
+      try {
+        await fs.promises.rm(folderPath, { recursive: true, force: true });
+      } catch (err) {
+        console.error('Błąd przy czyszczeniu folderu testowego:', err);
       }
     });
+    
   
   });
   
