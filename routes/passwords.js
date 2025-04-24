@@ -7,7 +7,6 @@ const {
   getPasswordByUserId,
   createPassword,
   getPasswordByUserPlatformLogin,
-  updatePassword,
   deletePassword,
 } = require("../config/db/queries/password");
 const {
@@ -16,6 +15,26 @@ const {
   deletePasswordFile,
   createUserFilesZip,
 } = require("../utils/fileHandler");
+const { body, validationResult } = require("express-validator");
+
+const validateLoginCredentials = [
+  body("platform")
+    .trim()
+    .isLength({ min: 1, max: 50 })
+    .withMessage(
+      "Platform field cannot be empty and must not exceed 50 characters"
+    ),
+  body("login")
+    .trim()
+    .isLength({ min: 1, max: 50 })
+    .withMessage(
+      "Login field cannot be empty and must not exceed 50 characters"
+    ),
+  body("password")
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("Password field cannot be empty"),
+];
 
 router.get(
   "/",
@@ -40,31 +59,55 @@ router.get(
 router.post(
   "/:user_id/files",
   authenticateToken,
+  validateLoginCredentials,
   asyncHandler(async (req, res) => {
     const { user_id: userId } = req.params;
     const { password, platform, login, logo } = req.body;
-    if (userId !== req.user.id) throw new CustomError("Frobidden", 403);
-    const filename = await createPasswordFile(userId, password);
+    if (!/^[a-zA-Z0-9_-]+$/.test(userId)) throw new CustomError("Invalid user ID", 400);
+    if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      throw new CustomError(
+        errors.array().map((err) => err.msg),
+        400
+      );
+    }
+    const [loginCredentials] = await getPasswordByUserPlatformLogin(
+      userId,
+      platform,
+      login
+    );
+    if (loginCredentials) {
+      throw new CustomError("Login credentials already exist", 400);
+    }
     const id = await createPassword({
-      passwordfile: filename,
       logo: "https://img.freepik.com/darmowe-wektory/nowy-projekt-ikony-x-logo-twittera-2023_1017-45418.jpg?semt=ais_hybrid",
       platform,
       login,
       userId,
     });
-    res
-      .status(201)
-      .json({ id, passwordfile: filename, logo, platform, login, userId });
+    const filename = await createPasswordFile(userId, id, password);
+    res.status(201).json({ id, filename, logo, platform, login, userId });
   })
 );
-// creates new file after every valid request ???
 router.put(
   "/:user_id/passwords/:platform/:login",
   authenticateToken,
+  body("new_password")
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("New password field cannot be empty"),
   asyncHandler(async (req, res) => {
     const { user_id: userId, platform, login } = req.params;
     const { new_password } = req.body;
+    if (!/^[a-zA-Z0-9_-]+$/.test(userId)) throw new CustomError("Invalid user ID", 400);
     if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      throw new CustomError(
+        errors.array().map((err) => err.msg),
+        400
+      );
     const [loginCredentials] = await getPasswordByUserPlatformLogin(
       userId,
       platform,
@@ -73,10 +116,9 @@ router.put(
     if (!loginCredentials) throw new CustomError("Password not found", 404);
     const newFilename = await updatePasswordFile(
       userId,
-      loginCredentials.passwordfile,
+      loginCredentials.id,
       new_password
     );
-    await updatePassword(loginCredentials.id, newFilename);
     res.json({
       id: loginCredentials.id,
       passwordfile: newFilename,
@@ -93,6 +135,7 @@ router.delete(
   authenticateToken,
   asyncHandler(async (req, res) => {
     const { user_id: userId, platform, login } = req.params;
+    if (!/^[a-zA-Z0-9_-]+$/.test(userId)) throw new CustomError("Invalid user ID", 400);
     if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
     const [loginCredentials] = await getPasswordByUserPlatformLogin(
       userId,
@@ -100,7 +143,7 @@ router.delete(
       login
     );
     if (!loginCredentials) throw new CustomError("Password not found", 404);
-    await deletePasswordFile(userId, loginCredentials.passwordfile);
+    await deletePasswordFile(userId, loginCredentials.id);
     await deletePassword(userId, platform, login);
     res.json({ message: `Password for ${platform}/${login} deleted` });
   })
@@ -112,10 +155,26 @@ router.put(
   asyncHandler(async (req, res) => {
     const { user_id: userId } = req.params;
     const { passwordsall } = req.body;
+    if (!/^[a-zA-Z0-9_-]+$/.test(userId)) throw new CustomError("Invalid user ID", 400);
     if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
     const passwords = await getPasswordByUserId(userId);
     if (passwords.length === 0)
       throw new CustomError("No passwords found", 404);
+    if (!Array.isArray(passwordsall)) {
+      throw new CustomError("passwordsall must be an array", 400);
+    }
+    for (const p of passwordsall) {
+      const isInvalid =
+        typeof p !== "object" ||
+        !p ||
+        typeof p.platform !== "string" ||
+        typeof p.login !== "string" ||
+        (p.new_password !== undefined && typeof p.new_password !== "string");
+    
+      if (isInvalid) {
+        throw new CustomError("Invalid password data format", 400);
+      }
+    }
     const existingKeys = new Set(
       passwords.map((e) => `${e.platform}/${e.login}`)
     );
@@ -135,15 +194,9 @@ router.put(
         (e) => e.platform === platform && e.login === login
       );
       if (!entry) continue;
-      const newFilename = await updatePasswordFile(
-        userId,
-        entry.passwordfile,
-        new_password
-      );
-      await updatePassword(entry.id, newFilename);
+      await updatePasswordFile(userId, entry.id, new_password);
       updatedEntries.push({
         id: entry.id,
-        passwordfile: newFilename,
         logo: entry.logo,
         platform,
         login,

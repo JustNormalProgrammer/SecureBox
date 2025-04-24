@@ -1,45 +1,40 @@
 const fs = require("fs").promises;
-const path = require("path");
-const crypto = require("crypto");
+const path = require("node:path");
+const crypto = require("node:crypto");
 const archiver = require("archiver");
 
-const createPasswordFile = async (userId, password) => {
-  const passwordHash = crypto
+const createPasswordFile = async (userId, passwordId, password) => {
+  const passwordIdHah = crypto
     .createHash("sha256")
-    .update(password)
+    .update(passwordId)
     .digest("hex");
-  const filename = `${passwordHash.slice(0, 8)}.txt`;
+  const filename = `${passwordIdHah.slice(0, 8)}.txt`;
   const folderPath = path.join("files", userId);
   await fs.mkdir(folderPath, { recursive: true });
   await fs.writeFile(path.join(folderPath, filename), password);
   return filename;
 };
 
-const updatePasswordFile = async (userId, oldFilename, newPassword) => {
+const updatePasswordFile = async (userId, passwordId, newPassword) => {
   const folderPath = path.join("files", userId);
-  const oldFilePath = path.join(folderPath, oldFilename);
-  const newPasswordHash = crypto
+  const passwordIdHash = crypto
     .createHash("sha256")
-    .update(newPassword)
+    .update(passwordId)
     .digest("hex");
-  const newFilename = `${newPasswordHash.slice(0, 8)}.txt`;
+  const newFilename = `${passwordIdHash.slice(0, 8)}.txt`;
   const newFilePath = path.join(folderPath, newFilename);
 
-  if (
-    await fs
-      .access(oldFilePath)
-      .then(() => true)
-      .catch(() => false)
-  ) {
-    await fs.unlink(oldFilePath);
-  }
   await fs.mkdir(folderPath, { recursive: true });
   await fs.writeFile(newFilePath, newPassword);
   return newFilename;
 };
 
-const deletePasswordFile = async (userId, filename) => {
-  const filePath = path.join("files", userId, filename);
+const deletePasswordFile = async (userId, passwordId) => {
+  const fileName = crypto
+  .createHash("sha256")
+  .update(passwordId)
+  .digest("hex");
+  const filePath = path.join("files", userId, `${fileName.slice(0, 8)}.txt`);
   if (
     await fs
       .access(filePath)

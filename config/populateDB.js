@@ -1,6 +1,6 @@
 const { Client } = require("pg");
 const fs = require("fs").promises;
-const path = require("path");
+const path = require("node:path");
 const crypto = require("crypto");
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 
