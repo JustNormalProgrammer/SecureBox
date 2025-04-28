@@ -16,6 +16,7 @@ const {
   createUserFilesZip,
 } = require("../utils/fileHandler");
 const { body, validationResult } = require("express-validator");
+const { getHash } = require("../utils/hashGen");
 
 const validateLoginCredentials = [
   body("platform")
@@ -41,7 +42,11 @@ router.get(
   authenticateToken,
   asyncHandler(async (req, res) => {
     const passwords = await getPasswordByUserId(req.user.id);
-    res.json(passwords);
+    const res2 = await Promise.all(passwords.map(async (p) => ({
+      ...p,
+      passwordfile: await getHash(p.id),
+    })))
+     res.json(res2);
   })
 );
 

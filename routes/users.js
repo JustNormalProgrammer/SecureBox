@@ -31,6 +31,7 @@ const { createUserFilesZip } = require("../utils/fileHandler");
 
 const validateUser = [
   body("first_name")
+    .optional()
     .trim()
     .isAlpha("pl-PL", {ignore: " -'"})
     .withMessage("First name must contain only letters except for space, - and ' characters ")
@@ -39,6 +40,7 @@ const validateUser = [
       "First name cannot be empty and must not exceed 50 characters"
     ),
   body("last_name")
+    .optional()
     .trim()
     .isAlpha("pl-PL", { ignore: " -'" })
     .withMessage(
@@ -47,12 +49,14 @@ const validateUser = [
     .isLength({ min: 1, max: 50 })
     .withMessage("Last name cannot be empty and must not exceed 50 characters"),
   body("login")
+    .optional()
     .trim()
     .isLength({ min: 1, max: 50 })
     .withMessage(
       "Login field cannot be empty and must not exceed 50 characters"
     ),
   body("password")
+    .optional()
     .trim()
     .isStrongPassword({
       minLength: 8,
@@ -96,6 +100,9 @@ router.post(
       login,
       password,
     } = req.body;
+    if (!first_name || !last_name || !login || !password) {
+      throw new CustomError("All fields are required", 400);
+    }
     const existingUser = await getUserByLogin(login);
     if (existingUser.length > 0)
       throw new CustomError("Login already exists", 400);
@@ -118,13 +125,12 @@ router.patch(
         errors.array().map((err) => err.msg),
         400
       );
-    const {
-      first_name: firstName,
-      last_name: lastName,
-      login,
-      password,
-    } = req.body;
-    await updateUser(userId, { firstName, lastName, login, password });
+      const updatedFields= {};
+
+    if (req.body.first_name !== undefined) updatedFields.firstName = req.body.first_name;
+    if (req.body.last_name !== undefined) updatedFields.lastName = req.body.last_name;
+    if (req.body.password !== undefined) updatedFields.password = req.body.password;
+    await updateUser(userId, updatedFields);
     const [user] = await getUserById(userId);
     if (!user) throw new CustomError("User not found", 404);
     res.json({
