@@ -19,12 +19,12 @@ async function sendResetEmail(to, resetLink) {
     from: `"Securebox" <${process.env.EMAIL_USER}>`,
     to: to,
     subject: "Resetowanie hasła",
-    text: `Witaj,\n\nAby zresetować hasło, kliknij poniższy link:\n${resetLink}\n\nLink jest ważny przez 1 godzinę.\n\nPozdrawiamy,\nSecureBox`,
+    text: `Witaj,\n\nAby zresetować hasło, kliknij poniższy link:\n${resetLink}\n\nLink jest ważny przez 10 godzin.\n\nPozdrawiamy,\nSecureBox`,
     html: `
       <h2>Witaj!</h2>
       <p>Aby zresetować hasło, kliknij poniższy link:</p>
       <a href="${resetLink}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Zresetuj hasło</a>
-      <p>Link jest ważny przez 1 godzinę.</p>
+      <p>Link jest ważny przez 10 godzin.</p>
       <p>Pozdrawiamy,<br>SecureBox</p>
     `,
   };

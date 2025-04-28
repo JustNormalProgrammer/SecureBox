@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "nodemon app.js",
     "test": "jest",
     "test:watch": "jest --watch"
   },
@@ -15,7 +16,7 @@
     "archiver": "^7.0.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "drizzle-orm": "^0.41.0",
+    "drizzle-orm": "^0.43.1",
     "express": "^4.21.2",
     "express-async-handler": "^1.2.0",
     "express-validator": "^7.2.1",
@@ -29,7 +30,7 @@
   "devDependencies": {
     "@types/pg": "^8.11.11",
     "chai": "^5.2.0",
-    "drizzle-kit": "^0.19.1",
+    "drizzle-kit": "^0.31.0",
     "jest": "^29.7.0",
     "mocha": "^11.1.0",
     "nodemon": "^3.1.9",

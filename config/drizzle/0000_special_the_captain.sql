@@ -1,6 +1,3 @@
--- Current sql file was generated after introspecting the database
--- If you want to run this migration please uncomment this code before executing migrations
-/*
 CREATE TABLE "users" (
 	"id" text PRIMARY KEY NOT NULL,
 	"first_name" text NOT NULL,
@@ -12,7 +9,6 @@ CREATE TABLE "users" (
 --> statement-breakpoint
 CREATE TABLE "passwords" (
 	"id" text PRIMARY KEY NOT NULL,
-	"passwordfile" text NOT NULL,
 	"logo" text NOT NULL,
 	"platform" text NOT NULL,
 	"login" text NOT NULL,
@@ -35,7 +31,14 @@ CREATE TABLE "trusted_devices" (
 	CONSTRAINT "trusted_devices_pkey" PRIMARY KEY("user_id","device_id")
 );
 --> statement-breakpoint
+CREATE TABLE "password_reset_tokens" (
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
+	"token" text NOT NULL,
+	"expiresAt" timestamp with time zone NOT NULL
+);
+--> statement-breakpoint
 ALTER TABLE "passwords" ADD CONSTRAINT "passwords_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "login_entries" ADD CONSTRAINT "login_entries_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "trusted_devices" ADD CONSTRAINT "trusted_devices_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
-*/
+ALTER TABLE "trusted_devices" ADD CONSTRAINT "trusted_devices_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "password_reset_tokens" ADD CONSTRAINT "password_reset_tokens_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;

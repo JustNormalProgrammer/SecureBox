@@ -1,6 +1,6 @@
 {
-  "id": "00000000-0000-0000-0000-000000000000",
-  "prevId": "",
+  "id": "1a15d5b0-52b6-48b8-8398-a29d22a88f12",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -44,15 +44,15 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "users_login_key": {
+          "name": "users_login_key",
+          "nullsNotDistinct": false,
           "columns": [
             "login"
-          ],
-          "nullsNotDistinct": false,
-          "name": "users_login_key"
+          ]
         }
       },
-      "checkConstraints": {},
       "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "public.passwords": {
@@ -63,12 +63,6 @@
           "name": "id",
           "type": "text",
           "primaryKey": true,
-          "notNull": true
-        },
-        "passwordfile": {
-          "name": "passwordfile",
-          "type": "text",
-          "primaryKey": false,
           "notNull": true
         },
         "logo": {
@@ -102,7 +96,6 @@
           "name": "passwords_user_id_fkey",
           "tableFrom": "passwords",
           "tableTo": "users",
-          "schemaTo": "public",
           "columnsFrom": [
             "user_id"
           ],
@@ -115,8 +108,8 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {},
       "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "public.login_entries": {
@@ -131,13 +124,13 @@
           "identity": {
             "type": "always",
             "name": "login_entries_id_seq",
+            "schema": "public",
             "increment": "1",
+            "startWith": "1",
             "minValue": "1",
             "maxValue": "2147483647",
-            "startWith": "1",
             "cache": "1",
-            "cycle": false,
-            "schema": "public"
+            "cycle": false
           }
         },
         "timestamp": {
@@ -171,7 +164,6 @@
           "name": "login_entries_user_id_fkey",
           "tableFrom": "login_entries",
           "tableTo": "users",
-          "schemaTo": "public",
           "columnsFrom": [
             "user_id"
           ],
@@ -184,8 +176,8 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {},
       "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "public.trusted_devices": {
@@ -223,7 +215,6 @@
           "name": "trusted_devices_user_id_fkey",
           "tableFrom": "trusted_devices",
           "tableTo": "users",
-          "schemaTo": "public",
           "columnsFrom": [
             "user_id"
           ],
@@ -244,8 +235,59 @@
         }
       },
       "uniqueConstraints": {},
-      "checkConstraints": {},
       "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.password_reset_tokens": {
+      "name": "password_reset_tokens",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "token": {
+          "name": "token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expiresAt": {
+          "name": "expiresAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "password_reset_tokens_user_id_fkey": {
+          "name": "password_reset_tokens_user_id_fkey",
+          "tableFrom": "password_reset_tokens",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     }
   },
@@ -256,11 +298,8 @@
   "policies": {},
   "views": {},
   "_meta": {
+    "columns": {},
     "schemas": {},
-    "tables": {},
-    "columns": {}
-  },
-  "internal": {
     "tables": {}
   }
 }

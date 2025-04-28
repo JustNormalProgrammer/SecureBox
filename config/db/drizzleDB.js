@@ -7,7 +7,6 @@ const { users, passwords, loginEntries, trustedDevices } = require("./schema");
 
 const db = drizzle({
   connection: process.env.DATABASE_URL,
-  casing: "snake_case",
   logger: true,
   schema: { users, passwords, loginEntries, trustedDevices },
 });

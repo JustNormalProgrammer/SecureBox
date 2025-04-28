@@ -244,8 +244,9 @@ router.post(
     }
 
     const resetToken = generateResetToken();
-    await saveResetToken(existingUser[0].id, resetToken); 
-    const resetLink = `http://localhost:5173/reset-password/${resetToken}`;
+    await saveResetToken(existingUser[0].id, resetToken);
+    const tenHoursFromNow = new Date(Date.now() + 10 * 60 * 60 * 1000); 
+    const resetLink = `http://localhost:5173/reset-password/${resetToken}?exp=${tenHoursFromNow.toISOString()}`;
 
     await sendResetEmail(login, resetLink); 
 
