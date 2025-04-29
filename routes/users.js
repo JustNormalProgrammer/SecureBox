@@ -51,6 +51,8 @@ const validateUser = [
   body("login")
     .optional()
     .trim()
+    .isEmail()
+    .withMessage("Login must be a valid email adress")
     .isLength({ min: 1, max: 50 })
     .withMessage(
       "Login field cannot be empty and must not exceed 50 characters"
@@ -72,6 +74,8 @@ const validateUser = [
 const validateLogin = [
   body("login")
     .trim()
+    .isEmail()
+    .withMessage("Login must be a valid email adress")
     .isLength({ min: 1, max: 50 })
     .withMessage(
       "Login field cannot be empty and must not exceed 50 characters"
@@ -100,7 +104,7 @@ router.post(
       login,
       password,
     } = req.body;
-    if (!first_name || !last_name || !login || !password) {
+    if (!firstName || !lastName || !login || !password) {
       throw new CustomError("All fields are required", 400);
     }
     const existingUser = await getUserByLogin(login);
