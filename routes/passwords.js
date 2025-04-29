@@ -17,6 +17,17 @@ const {
   createUserFilesZip,
 } = require("../utils/fileHandler");
 
+/**
+ * GET /passwords
+ * 
+ * Pobiera wszystkie hasła dla użytkownika.
+ * 
+ * @route GET /passwords
+ * @param {Object} req - Obiekt żądania.
+ * @param {Object} req.user - Obiekt użytkownika, zawiera informacje o użytkowniku (weryfikacja tokenu).
+ * @param {Object} res - Obiekt odpowiedzi.
+ * @returns {Array} 200 - Lista haseł dla użytkownika.
+ */
 router.get(
   "/",
   authenticateToken,
@@ -26,6 +37,18 @@ router.get(
   })
 );
 
+/**
+ * GET /:user_id/files
+ * 
+ * Tworzy plik ZIP zawierający pliki użytkownika.
+ * 
+ * @route GET /:user_id/files
+ * @param {Object} req - Obiekt żądania.
+ * @param {string} req.params.user_id - ID użytkownika.
+ * @param {Object} res - Obiekt odpowiedzi.
+ * @returns {File} 200 - Plik ZIP zawierający pliki użytkownika.
+ * @throws {CustomError} 403 - Jeśli żądany user_id nie jest równy ID użytkownika w tokenie.
+ */
 router.get(
   "/:user_id/files",
   authenticateToken,
@@ -37,6 +60,23 @@ router.get(
   })
 );
 
+/**
+ * POST /:user_id/files
+ * 
+ * Tworzy nowy plik z hasłem dla użytkownika.
+ * 
+ * @route POST /:user_id/files
+ * @param {Object} req - Obiekt żądania.
+ * @param {string} req.params.user_id - ID użytkownika.
+ * @param {Object} req.body - Ciało żądania.
+ * @param {string} req.body.password - Hasło do zapisania.
+ * @param {string} req.body.platform - Platforma (np. "Facebook").
+ * @param {string} req.body.login - Login użytkownika na platformie.
+ * @param {string} req.body.logo - Logo platformy.
+ * @param {Object} res - Obiekt odpowiedzi.
+ * @returns {Object} 201 - Szczegóły utworzonego pliku z hasłem.
+ * @throws {CustomError} 403 - Jeśli żądany user_id nie jest równy ID użytkownika w tokenie.
+ */
 router.post(
   "/:user_id/files",
   authenticateToken,
@@ -57,7 +97,23 @@ router.post(
       .json({ id, passwordfile: filename, logo, platform, login, userId });
   })
 );
-// creates new file after every valid request ???
+
+/**
+ * PUT /:user_id/passwords/:platform/:login
+ * 
+ * Aktualizuje hasło dla danego loginu i platformy.
+ * 
+ * @route PUT /:user_id/passwords/:platform/:login
+ * @param {Object} req - Obiekt żądania.
+ * @param {string} req.params.user_id - ID użytkownika.
+ * @param {string} req.params.platform - Platforma, dla której aktualizowane jest hasło.
+ * @param {string} req.params.login - Login użytkownika na platformie.
+ * @param {string} req.body.new_password - Nowe hasło do zapisania.
+ * @param {Object} res - Obiekt odpowiedzi.
+ * @returns {Object} 200 - Zaktualizowane dane logowania użytkownika.
+ * @throws {CustomError} 403 - Jeśli żądany user_id nie jest równy ID użytkownika w tokenie.
+ * @throws {CustomError} 404 - Jeśli dane logowania nie zostały znalezione.
+ */
 router.put(
   "/:user_id/passwords/:platform/:login",
   authenticateToken,
@@ -88,6 +144,21 @@ router.put(
   })
 );
 
+/**
+ * DELETE /:user_id/passwords/:platform/:login
+ * 
+ * Usuwa hasło dla danego loginu i platformy.
+ * 
+ * @route DELETE /:user_id/passwords/:platform/:login
+ * @param {Object} req - Obiekt żądania.
+ * @param {string} req.params.user_id - ID użytkownika.
+ * @param {string} req.params.platform - Platforma, z której usuwane jest hasło.
+ * @param {string} req.params.login - Login użytkownika na platformie.
+ * @param {Object} res - Obiekt odpowiedzi.
+ * @returns {Object} 200 - Potwierdzenie usunięcia hasła.
+ * @throws {CustomError} 403 - Jeśli żądany user_id nie jest równy ID użytkownika w tokenie.
+ * @throws {CustomError} 404 - Jeśli dane logowania nie zostały znalezione.
+ */
 router.delete(
   "/:user_id/passwords/:platform/:login",
   authenticateToken,
@@ -106,6 +177,21 @@ router.delete(
   })
 );
 
+/**
+ * PUT /:user_id/passwords
+ * 
+ * Aktualizuje wiele haseł użytkownika.
+ * 
+ * @route PUT /:user_id/passwords
+ * @param {Object} req - Obiekt żądania.
+ * @param {string} req.params.user_id - ID użytkownika.
+ * @param {Array} req.body.passwordsall - Lista nowych danych logowania z nowymi hasłami.
+ * @param {Object} res - Obiekt odpowiedzi.
+ * @returns {Array} 200 - Zaktualizowane dane logowania użytkownika.
+ * @throws {CustomError} 403 - Jeśli żądany user_id nie jest równy ID użytkownika w tokenie.
+ * @throws {CustomError} 404 - Jeśli żadne hasła nie zostały znalezione.
+ * @throws {CustomError} 400 - Jeśli nie wszystkie konta zostały zaktualizowane.
+ */
 router.put(
   "/:user_id/passwords",
   authenticateToken,

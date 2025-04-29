@@ -8,6 +8,15 @@ const client = new Client({
   connectionString: `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DATABASE}`,
 });
 
+/**
+ * Inicjalizuje bazy danych, tworząc tabele, jeśli nie istnieją.
+ * 
+ * Tworzy tabele `users`, `passwords`, `trusted_devices`, oraz `login_entries`, które są potrzebne do przechowywania informacji o użytkownikach, hasłach, zaufanych urządzeniach i wpisach logowania.
+ * 
+ * @async
+ * @function initDB
+ * @returns {Promise<void>} - Zwraca `Promise` zakończoną po utworzeniu tabel.
+ */
 const initDB = async () => {
   const createSQL = `
     CREATE TABLE IF NOT EXISTS users (
@@ -50,6 +59,16 @@ const initDB = async () => {
   return;
 };
 
+/**
+ * Dodaje dane początkowe do bazy danych.
+ * 
+ * Wstawia przykładowych użytkowników, ich hasła, zaufane urządzenia oraz wpisy logowania.
+ * Tworzy także odpowiednią strukturę plików dla każdego użytkownika.
+ * 
+ * @async
+ * @function addData
+ * @returns {Promise<void>} - Zwraca `Promise` zakończoną po dodaniu danych.
+ */
 async function addData() {
   const userId = "1";
   const hashedPassword = crypto
@@ -94,6 +113,16 @@ async function addData() {
   return;
 }
 
+/**
+ * Funkcja główna inicjalizująca połączenie z bazą danych, tworząca tabele i dodająca dane.
+ * 
+ * Łączy się z bazą danych, wywołuje funkcje do tworzenia tabel oraz dodawania przykładowych danych.
+ * Zamyka połączenie po zakończeniu operacji.
+ * 
+ * @async
+ * @function main
+ * @returns {Promise<void>} - Zwraca `Promise` zakończoną po zakończeniu operacji.
+ */
 async function main() {
   console.log("Connecting...");
   try {
