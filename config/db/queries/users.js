@@ -1,7 +1,7 @@
 const db = require("../drizzleDB");
 const crypto = require("node:crypto");
-const { users,passwordResetTokens } = require("../schema");
-const { eq, and } = require("drizzle-orm");
+const { users,passwordResetTokens, loginAttempts } = require("../schema");
+const { eq, and, gte } = require("drizzle-orm");
 
 async function getUserById(userId) {
   const result = await db
@@ -11,6 +11,47 @@ async function getUserById(userId) {
     .limit(1);
   return result;
 }
+
+async function canUserLogin(userId) {
+  const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+  // Count failed login attempts in last 10 minutes
+  
+    const failedAttempts = await db
+    .select()
+    .from(loginAttempts)
+    .where(
+      and(
+        eq(loginAttempts.userId, userId),
+        eq(loginAttempts.success, false),
+        gte(loginAttempts.timestamp, tenMinutesAgo.toISOString())
+      )
+    );
+
+  // If 5 or more failed attempts, check if lockout period is still active
+  if (failedAttempts.length >= 5) {
+    const lastFailedAttempt = failedAttempts.sort((a, b) => 
+      new Date(b.timestamp) - new Date(a.timestamp)
+    )[0];
+    
+    const lockoutEnd = new Date(new Date(lastFailedAttempt.timestamp).getTime() + 10 * 60 * 1000);
+    if (lockoutEnd > new Date()) {
+      return { canLogin: false, lockoutUntil: lockoutEnd };
+    }
+  }
+  
+  return { canLogin: true };
+}
+
+async function recordLoginAttempt(userId, success) {
+  const id = crypto.randomUUID();
+  await db.insert(loginAttempts).values({
+    id,
+    userId,
+    timestamp: new Date().toISOString(),
+    success
+  });
+}
+
 async function createUser({ firstName, lastName, login, password }) {
   const id = crypto.randomUUID();
   const hashedPassword = crypto
@@ -31,16 +72,32 @@ async function getUserByLogin(login) {
   return user;
 }
 async function getUserByLoginAndPassword(login, password) {
+  const [user] = await db
+    .select()
+    .from(users)
+    .where(eq(users.login, login))
+    .limit(1);
+  
+  if (!user) {
+    return null;
+  }
+  const loginCheck = await canUserLogin(user.id);
+  if (!loginCheck.canLogin) {
+    await recordLoginAttempt(user.id, false);
+    return { error: "Account locked", lockoutUntil: loginCheck.lockoutUntil };
+  }
   const hashedPassword = crypto
     .createHash("sha256")
     .update(password)
     .digest("hex");
-  const user = await db
-    .select()
-    .from(users)
-    .where(and(eq(users.login, login), eq(users.password, hashedPassword)))
-    .limit(1);
-  return user;
+  
+  if (hashedPassword !== user.password) {
+    await recordLoginAttempt(user.id, false);
+    return null;
+  }
+
+  await recordLoginAttempt(user.id, true);
+  return [user];
 }
 async function updateUser(id, { firstName, lastName, login, password }) {
   const updates = {};
@@ -113,6 +170,8 @@ module.exports = {
   getUserByLoginAndPassword,
   updateUser,
   getUserByLogin,
+  canUserLogin,
+  recordLoginAttempt,
   saveResetToken,
   deleteResetToken,
   verifyResetToken

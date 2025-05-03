@@ -101,3 +101,23 @@ exports.passwordResetTokens = (0, pg.pgTable)(
     }).onDelete("cascade"),
   ]
 );
+
+exports.loginAttempts = (0, pg.pgTable)(
+  "login_attempts",
+  {
+    id: (0, pg.text)().primaryKey().notNull(),
+    userId: (0, pg.text)("user_id").notNull(),
+    timestamp: (0, pg.timestamp)({
+      withTimezone: true,
+      mode: "string",
+    }).notNull(),
+    success: (0, pg.boolean)().notNull(),
+  },
+  (table) => [
+    (0, pg.foreignKey)({
+      columns: [table.userId],
+      foreignColumns: [exports.users.id],
+      name: "login_attempts_user_id_fkey",
+    }).onDelete("cascade"),
+  ]
+);

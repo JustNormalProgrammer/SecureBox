@@ -28,6 +28,7 @@ const fs = require("fs").promises;
 const path = require("path");
 const { body, validationResult } = require("express-validator");
 const { createUserFilesZip } = require("../utils/fileHandler");
+const {validateRecaptcha} = require("../utils/captcha");
 
 const validateUser = [
   body("first_name")
@@ -88,6 +89,22 @@ const validateLogin = [
     ),
 ];
 
+const validatePassword = [
+  body("newPassword")
+    .optional()
+    .trim()
+    .isStrongPassword({
+      minLength: 8,
+      minLowercase: 1,
+      minUppercase: 1,
+      minNumbers: 1,
+      minSymbols: 1,
+    })
+    .withMessage(
+      "Password field must be at least 8 characters long, contain at least one lowercase letter, uppercase letter, number and a symbol"
+    ),
+]
+
 router.post(
   "/",
   validateUser,
@@ -110,6 +127,9 @@ router.post(
     const existingUser = await getUserByLogin(login);
     if (existingUser.length > 0)
       throw new CustomError("Login already exists", 400);
+    const recaptchaToken = req.body.token;
+    const recaptchaResult = await validateRecaptcha(recaptchaToken);
+    if (!recaptchaResult) throw new CustomError("Invalid reCAPTCHA", 400);
     const id = await createUser({ firstName, lastName, login, password });
     await fs.mkdir(path.join("files", id), { recursive: true });
     res.status(201).json({ id, firstName, lastName, login });
@@ -193,6 +213,8 @@ router.post(
     const { user_id: userId } = req.params;
     if (userId !== req.user.id) throw new CustomError("Forbidden", 403);
     const { login, page } = req.body;
+    const [user] = await getUserById(userId);
+    if (!user) throw new CustomError("User not found", 404);
     const result = await createLoginEntry({ userId, login, page });
     return res.status(201).json(result);
   })
@@ -253,6 +275,10 @@ router.post(
       return res.status(200).json({ message: "Jeśli login istnieje, link resetujący został wysłany" });
     }
 
+    const recaptchaToken = req.body.token;
+    const recaptchaResult = await validateRecaptcha(recaptchaToken);
+    if (!recaptchaResult) throw new CustomError("Invalid reCAPTCHA", 400);
+
     const resetToken = generateResetToken();
     await saveResetToken(existingUser[0].id, resetToken);
     const tenHoursFromNow = new Date(Date.now() + 10 * 60 * 60 * 1000); 
@@ -267,7 +293,7 @@ router.post(
 
 
 router.post(
-  "/reset-password/confirm",
+  "/reset-password/confirm",validatePassword,
   asyncHandler(async (req, res) => {
     const { resetToken, newPassword } = req.body;
 
@@ -279,6 +305,12 @@ router.post(
     if (!user) {
       throw new CustomError("Nieprawidłowy lub wygasły token resetu", 401);
     }
+    const errors = validationResult(req);
+    if (!errors.isEmpty())
+      throw new CustomError(
+        errors.array().map((err) => err.msg),
+        400
+      );
 
     await updateUser(user.id, { password: newPassword });
     await deleteResetToken(resetToken);
