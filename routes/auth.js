@@ -14,6 +14,9 @@ router.post(
     if (!login || !password || !token2) {
       throw new CustomError("Missing required fields", 400);
     }
+    if (typeof login !== "string" || typeof password !== "string" || typeof token2 !== "string") {
+      throw new CustomError("Invalid field types", 400);
+    }
     if (login.trim() === "" || password.trim() === "" || token2.trim() === "") {
       throw new CustomError("Fields cannot be empty", 400);
     }
