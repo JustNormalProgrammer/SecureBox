@@ -31,10 +31,11 @@ router.post(
     const token = jwt.sign({ user_id: user.id }, SECRET_KEY, {
       expiresIn: `${TOKEN_EXPIRATION_MINUTES}m`,
     });
+    const isProduction = process.env.NODE_ENV === "production";
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "strict",
       maxAge: TOKEN_EXPIRATION_MINUTES * 60 * 1000,
     });
     res.json({

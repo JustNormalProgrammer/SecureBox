@@ -92,7 +92,7 @@ router.post(
       userId,
     });
     const filename = await createPasswordFile(userId, id, password);
-    res.status(201).json({ id, filename, logo, platform, login, userId });
+    res.status(201).json({ id, passwordfile: filename, logo, platform, login, userId });
   })
 );
 router.put(

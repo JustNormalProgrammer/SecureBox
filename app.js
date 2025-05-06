@@ -11,6 +11,7 @@ const cookieParser = require('cookie-parser');
 const app = express();
 
 const envtype = process.env.NODE_ENV || 'development';
+const isProduction = envtype === 'production';
 const csrfSecret = process.env.CSRF_SECRET
 const allowedOrigins = [
   'https://orange-ground-00ae1ad03.6.azurestaticapps.net',
@@ -42,8 +43,8 @@ const { doubleCsrfProtection } = doubleCsrf({
   getSecret: () => csrfSecret,
   cookieName: 'csrf-secret',
   cookieOptions: {
-    secure: envtype === 'production',
-    sameSite: 'strict',
+    secure: isProduction,
+    sameSite: isProduction ? "none" :'strict',
     httpOnly: true, 
   },
   size: 64,
@@ -53,8 +54,8 @@ const { doubleCsrfProtection } = doubleCsrf({
     if (!sessionId) {
       sessionId = crypto.randomBytes(16).toString('hex');
       req.res.cookie('session-id', sessionId, {
-        secure: envtype === 'production',
-        sameSite: 'strict',
+        secure: isProduction,
+        sameSite: isProduction ? "none" :'strict',
         httpOnly: true,
       });
     }
