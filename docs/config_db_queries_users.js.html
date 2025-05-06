@@ -1,4 +1,45 @@
-const db = require("../drizzleDB");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>config/db/queries/users.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="CustomError.html">CustomError</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#authenticateToken">authenticateToken</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#canUserLogin">canUserLogin</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#createLoginEntry">createLoginEntry</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#createPassword">createPassword</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#createPasswordFile">createPasswordFile</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#createUser">createUser</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#createUserFilesZip">createUserFilesZip</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#deletePassword">deletePassword</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#deletePasswordFile">deletePasswordFile</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#deleteResetToken">deleteResetToken</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#deleteTrustedDevice">deleteTrustedDevice</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#generateResetToken">generateResetToken</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getHash">getHash</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getLoginEntriesByUserId">getLoginEntriesByUserId</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getPasswordByUserId">getPasswordByUserId</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getPasswordByUserPlatformLogin">getPasswordByUserPlatformLogin</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getTrustedDevicesByUserId">getTrustedDevicesByUserId</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getUserById">getUserById</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getUserByLogin">getUserByLogin</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getUserByLoginAndPassword">getUserByLoginAndPassword</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#recordLoginAttempt">recordLoginAttempt</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#saveResetToken">saveResetToken</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#sendResetEmail">sendResetEmail</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#updatePasswordFile">updatePasswordFile</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#updateUser">updateUser</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#upsertTrustedDevice">upsertTrustedDevice</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#validateRecaptcha">validateRecaptcha</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#verifyResetToken">verifyResetToken</a></span></li>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">config/db/queries/users.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const db = require("../drizzleDB");
 const crypto = require("node:crypto");
 const { users,passwordResetTokens, loginAttempts } = require("../schema");
 const { eq, and, gte } = require("drizzle-orm");
@@ -11,7 +52,7 @@ const { eq, and, gte } = require("drizzle-orm");
  * @async
  * @function getUserById
  * @param {string} userId - ID użytkownika, którego chcesz pobrać.
- * @returns {Promise<Object[]>} - Zwraca `Promise` zawierający tablicę z użytkownikiem, lub pustą tablicę, jeśli użytkownik nie istnieje.
+ * @returns {Promise&lt;Object[]>} - Zwraca `Promise` zawierający tablicę z użytkownikiem, lub pustą tablicę, jeśli użytkownik nie istnieje.
  */
 async function getUserById(userId) {
   const result = await db
@@ -33,7 +74,7 @@ async function getUserById(userId) {
  * jeśli jest ona aktywna.
  * 
  * @param {string} userId - Identyfikator użytkownika, którego próby logowania mają zostać sprawdzone.
- * @returns {Promise<{canLogin: boolean, lockoutUntil: Date | undefined}>} Obiekt z informacją o możliwości logowania oraz czasem końca blokady (jeśli dotyczy).
+ * @returns {Promise&lt;{canLogin: boolean, lockoutUntil: Date | undefined}>} Obiekt z informacją o możliwości logowania oraz czasem końca blokady (jeśli dotyczy).
  * @throws {Error} W przypadku błędów podczas odczytu danych z bazy danych.
  */
 async function canUserLogin(userId) {
@@ -74,7 +115,7 @@ async function canUserLogin(userId) {
  * 
  * @param {string} userId - Identyfikator użytkownika, który podjął próbę logowania.
  * @param {boolean} success - Wynik próby logowania: `true` oznacza sukces, `false` oznacza porażkę.
- * @returns {Promise<void>} 
+ * @returns {Promise&lt;void>} 
  * @throws {Error} W przypadku problemów z zapisaniem danych do bazy.
  */
 async function recordLoginAttempt(userId, success) {
@@ -99,7 +140,7 @@ async function recordLoginAttempt(userId, success) {
  * @param {string} userData.lastName - Nazwisko użytkownika.
  * @param {string} userData.login - Login użytkownika.
  * @param {string} userData.password - Hasło użytkownika.
- * @returns {Promise<string>} - Zwraca `Promise` z ID nowo utworzonego użytkownika.
+ * @returns {Promise&lt;string>} - Zwraca `Promise` z ID nowo utworzonego użytkownika.
  */
 async function createUser({ firstName, lastName, login, password }) {
   const id = crypto.randomUUID();
@@ -121,7 +162,7 @@ async function createUser({ firstName, lastName, login, password }) {
  * @async
  * @function getUserByLogin
  * @param {string} login - Login użytkownika, którego chcesz pobrać.
- * @returns {Promise<Object[]>} - Zwraca `Promise` zawierający tablicę z użytkownikiem, lub pustą tablicę, jeśli użytkownik nie istnieje.
+ * @returns {Promise&lt;Object[]>} - Zwraca `Promise` zawierający tablicę z użytkownikiem, lub pustą tablicę, jeśli użytkownik nie istnieje.
  */
 async function getUserByLogin(login) {
   const user = await db
@@ -142,7 +183,7 @@ async function getUserByLogin(login) {
  * @function getUserByLoginAndPassword
  * @param {string} login - Login użytkownika.
  * @param {string} password - Hasło użytkownika.
- * @returns {Promise<Object[]>} - Zwraca `Promise` z użytkownikiem, jeśli login i hasło są poprawne.
+ * @returns {Promise&lt;Object[]>} - Zwraca `Promise` z użytkownikiem, jeśli login i hasło są poprawne.
  */
 async function getUserByLoginAndPassword(login, password) {
   const [user] = await db
@@ -186,7 +227,7 @@ async function getUserByLoginAndPassword(login, password) {
  * @param {string} [updates.lastName] - Nowe nazwisko użytkownika.
  * @param {string} [updates.login] - Nowy login użytkownika.
  * @param {string} [updates.password] - Nowe hasło użytkownika (zostanie zaszyfrowane).
- * @returns {Promise<void>} - Funkcja nie zwraca żadnej wartości.
+ * @returns {Promise&lt;void>} - Funkcja nie zwraca żadnej wartości.
  */
 async function updateUser(id, { firstName, lastName, login, password }) {
   const updates = {};
@@ -210,7 +251,7 @@ async function updateUser(id, { firstName, lastName, login, password }) {
  * @function saveResetToken
  * @param {string} userId - ID użytkownika, który ma token resetowania.
  * @param {string} resetToken - Token resetowania hasła.
- * @returns {Promise<Object>} - Zwraca zapisany token wraz z czasem wygaśnięcia.
+ * @returns {Promise&lt;Object>} - Zwraca zapisany token wraz z czasem wygaśnięcia.
  */
 async function saveResetToken(userId, resetToken) {
   const id = crypto.randomUUID();
@@ -235,7 +276,7 @@ async function saveResetToken(userId, resetToken) {
  * @async
  * @function verifyResetToken
  * @param {string} resetToken - Token resetowania hasła.
- * @returns {Promise<Object|null>} - Zwraca użytkownika, jeśli token jest ważny, w przeciwnym razie `null`.
+ * @returns {Promise&lt;Object|null>} - Zwraca użytkownika, jeśli token jest ważny, w przeciwnym razie `null`.
  */
 async function verifyResetToken(resetToken) {
   const currentTime = new Date();
@@ -251,7 +292,7 @@ async function verifyResetToken(resetToken) {
     .where(eq(passwordResetTokens.token, resetToken))
     .limit(1);
 
-  if (!tokenRecord || new Date(tokenRecord.expiresAt) < currentTime) {
+  if (!tokenRecord || new Date(tokenRecord.expiresAt) &lt; currentTime) {
     return null;
   }
 
@@ -272,7 +313,7 @@ async function verifyResetToken(resetToken) {
  * @async
  * @function deleteResetToken
  * @param {string} resetToken - Token, który ma zostać usunięty.
- * @returns {Promise<boolean>} - Zwraca `true`, jeśli token został usunięty, w przeciwnym razie `false`.
+ * @returns {Promise&lt;boolean>} - Zwraca `true`, jeśli token został usunięty, w przeciwnym razie `false`.
  */
 async function deleteResetToken(resetToken) {
   const [deletedToken] = await db
@@ -296,3 +337,22 @@ module.exports = {
   deleteResetToken,
   verifyResetToken
 };
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a> on Tue May 06 2025 14:13:18 GMT+0000 (Coordinated Universal Time) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

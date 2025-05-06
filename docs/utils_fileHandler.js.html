@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>utils/fileHandler.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="CustomError.html">CustomError</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#authenticateToken">authenticateToken</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#canUserLogin">canUserLogin</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#createLoginEntry">createLoginEntry</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#createPassword">createPassword</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#createPasswordFile">createPasswordFile</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#createUser">createUser</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#createUserFilesZip">createUserFilesZip</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#deletePassword">deletePassword</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#deletePasswordFile">deletePasswordFile</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#deleteResetToken">deleteResetToken</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#deleteTrustedDevice">deleteTrustedDevice</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#generateResetToken">generateResetToken</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getHash">getHash</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getLoginEntriesByUserId">getLoginEntriesByUserId</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getPasswordByUserId">getPasswordByUserId</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getPasswordByUserPlatformLogin">getPasswordByUserPlatformLogin</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getTrustedDevicesByUserId">getTrustedDevicesByUserId</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getUserById">getUserById</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getUserByLogin">getUserByLogin</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getUserByLoginAndPassword">getUserByLoginAndPassword</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#recordLoginAttempt">recordLoginAttempt</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#saveResetToken">saveResetToken</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#sendResetEmail">sendResetEmail</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#updatePasswordFile">updatePasswordFile</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#updateUser">updateUser</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#upsertTrustedDevice">upsertTrustedDevice</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#validateRecaptcha">validateRecaptcha</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#verifyResetToken">verifyResetToken</a></span></li>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">utils/fileHandler.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file
+ * Moduł do obsługi plików związanych z hasłami użytkowników.
+ * Zawiera funkcje do tworzenia, aktualizacji i usuwania plików z hasłami,
+ * a także do tworzenia archiwum ZIP z plikami użytkownika.
+ */
+
+const fs = require("fs").promises;
+const path = require("node:path");
+const crypto = require("node:crypto");
+const archiver = require("archiver");
+
+/**
+ * Tworzy plik z hasłem.
+ * @param {number} userId - ID użytkownika.
+ * @param {string} password - Hasło użytkownika.
+ * @returns {Promise&lt;string>} Nazwa pliku, w którym hasło zostało zapisane.
+ * @throws {Error} Jeśli nie uda się utworzyć katalogu lub zapisać pliku.
+ */
+const createPasswordFile = async (userId, passwordId, password) => {
+  const passwordIdHah = crypto
+    .createHash("sha256")
+    .update(passwordId)
+    .digest("hex");
+  const filename = `${passwordIdHah.slice(0, 8)}.txt`;
+  const folderPath = path.join("files", userId);
+  await fs.mkdir(folderPath, { recursive: true });
+  await fs.writeFile(path.join(folderPath, filename), password);
+  return filename;
+};
+
+/**
+ * Tworzy nowy plik ze zmienionym hasłem.
+ * @param {number} userId - ID użytkownika.
+ * @param {string} oldFilename - Nazwa starego pliku.
+ * @param {string} newPassword - Nowe hasło użytkownika.
+ * @returns {Promise&lt;string>} Nazwa pliku, w którym (nowe) hasło zostało zapisane.
+ * @throws {Error} Jeśli nie uda się utworzyć katalogu lub zapisać pliku.
+ */
+const updatePasswordFile = async (userId, passwordId, newPassword) => {
+  const folderPath = path.join("files", userId);
+  const passwordIdHash = crypto
+    .createHash("sha256")
+    .update(passwordId)
+    .digest("hex");
+  const newFilename = `${passwordIdHash.slice(0, 8)}.txt`;
+  const newFilePath = path.join(folderPath, newFilename);
+
+  await fs.mkdir(folderPath, { recursive: true });
+  await fs.writeFile(newFilePath, newPassword);
+  return newFilename;
+};
+
+/**
+ * Usuwa plik z hasłem.
+ * @param {number} userId - ID użytkownika.
+ * @param {string} filename - Nazwa pliku do usunięcia.
+ * @returns {Promise&lt;void>}
+ * @throws {Error} Jeśli nie można usunąć pliku.
+ */
+const deletePasswordFile = async (userId, passwordId) => {
+  const fileName = crypto
+  .createHash("sha256")
+  .update(passwordId)
+  .digest("hex");
+  const filePath = path.join("files", userId, `${fileName.slice(0, 8)}.txt`);
+  if (
+    await fs
+      .access(filePath)
+      .then(() => true)
+      .catch(() => false)
+  ) {
+    await fs.unlink(filePath);
+  }
+};
+
+/**
+ * Tworzy archiwum ZIP z plikami użytkownika.
+ * @param {number} userId - ID użytkownika.
+ * @param {object} res - Obiekt odpowiedzi HTTP.
+ * @returns {void}
+ * @throws {Error} Jeśli nie można utworzyć archiwum.
+ */
+const createUserFilesZip = (userId, res) => {
+  const folderPath = path.join("files", userId);
+  const archive = archiver("zip", { zlib: { level: 9 } });
+  res.attachment(`user_${userId}_files.zip`);
+  archive.pipe(res);
+  archive.directory(folderPath, false).finalize();
+};
+
+module.exports = {
+  createPasswordFile,
+  updatePasswordFile,
+  deletePasswordFile,
+  createUserFilesZip,
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a> on Tue May 06 2025 14:13:18 GMT+0000 (Coordinated Universal Time) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

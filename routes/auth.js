@@ -7,6 +7,23 @@ const { getUserByLoginAndPassword } = require("../config/db/queries/users");
 const { SECRET_KEY, TOKEN_EXPIRATION_MINUTES } = require("../middleware/auth");
 const {validateRecaptcha} = require("../utils/captcha");
 
+/**
+ * POST /login
+ * 
+ * Obsługuje logowanie użytkownika poprzez weryfikację podanych loginu i hasła. 
+ * Jeśli dane uwierzytelniające są poprawne, zwrócony zostaje token JWT. 
+ * W przeciwnym razie, jeśli logowanie nie powiedzie się, próba logowania jest 
+ * rejestrowana, a następnie rzucany jest błąd typu CustomError z odpowiednimi 
+ * komunikatami o błędzie.
+ * 
+ * @route POST /login
+ * @param {Object} req - Obiekt żądania.
+ * @param {string} req.body.login - Login użytkownika.
+ * @param {string} req.body.password - Hasło użytkownika.
+ * @param {Object} res - Obiekt odpowiedzi.
+ * @throws {CustomError} 401 - Jeśli login lub hasło są niepoprawne.
+ * @returns {Object} 200 - Dane użytkownika oraz token JWT, jeśli logowanie jest poprawne.
+ */
 router.post(
   "/",
   asyncHandler(async (req, res) => {

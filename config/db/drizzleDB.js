@@ -3,11 +3,11 @@ const path = require("node:path");
 require("dotenv").config({ path: path.join(__dirname, "../..", ".env") });
 const { users, passwords, loginEntries, trustedDevices } = require("./schema");
 
-// logger enabled!!!
+const isProduction = process.env.NODE_ENV === 'production';
 
 const db = drizzle({
   connection: process.env.DATABASE_URL,
-  logger: true,
+  logger: isProduction,
   schema: { users, passwords, loginEntries, trustedDevices },
 });
 module.exports = db;

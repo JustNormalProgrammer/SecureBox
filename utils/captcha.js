@@ -1,3 +1,12 @@
+/**
+ * Funkcja walidująca odpowiedź reCAPTCHA v3 przy użyciu Google reCAPTCHA API.
+ *
+ * @param {string} token - Token reCAPTCHA, który należy zweryfikować.
+ * @returns {Promise<boolean>} - Zwraca `true` jeśli walidacja była pomyślna, w przeciwnym razie `false`.
+ * 
+ * @throws {Error} - W przypadku błędu podczas komunikacji z Google reCAPTCHA API, funkcja loguje błąd w konsoli.
+ */
+
 async function  validateRecaptcha(token)  {
     const secretKey = process.env.CAPTCHA_SECRET; 
     if(!secretKey) return false;

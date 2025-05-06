@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>middleware/auth.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="CustomError.html">CustomError</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#authenticateToken">authenticateToken</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#canUserLogin">canUserLogin</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#createLoginEntry">createLoginEntry</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#createPassword">createPassword</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#createPasswordFile">createPasswordFile</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#createUser">createUser</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#createUserFilesZip">createUserFilesZip</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#deletePassword">deletePassword</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#deletePasswordFile">deletePasswordFile</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#deleteResetToken">deleteResetToken</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#deleteTrustedDevice">deleteTrustedDevice</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#generateResetToken">generateResetToken</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getHash">getHash</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getLoginEntriesByUserId">getLoginEntriesByUserId</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getPasswordByUserId">getPasswordByUserId</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getPasswordByUserPlatformLogin">getPasswordByUserPlatformLogin</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getTrustedDevicesByUserId">getTrustedDevicesByUserId</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getUserById">getUserById</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getUserByLogin">getUserByLogin</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#getUserByLoginAndPassword">getUserByLoginAndPassword</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#recordLoginAttempt">recordLoginAttempt</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#saveResetToken">saveResetToken</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#sendResetEmail">sendResetEmail</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#updatePasswordFile">updatePasswordFile</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#updateUser">updateUser</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#upsertTrustedDevice">upsertTrustedDevice</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#validateRecaptcha">validateRecaptcha</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#verifyResetToken">verifyResetToken</a></span></li>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">middleware/auth.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const jwt = require("jsonwebtoken");
+const { getUserById } = require("../config/db/queries/users");
+
+require("dotenv").config();
+
+/**
+ * Middleware do autentykacji tokenu JWT.
+ * 
+ * Weryfikuje, czy w nagłówku żądania znajduje się ważny token JWT. 
+ * Jeśli token jest poprawny, użytkownik jest dodawany do obiektu `req.user`. 
+ * Jeśli token jest nieważny lub wygasł, zwróci odpowiedni błąd.
+ * 
+ * @function authenticateToken
+ * @param {Object} req - Obiekt żądania.
+ * @param {Object} req.headers - Nagłówki żądania.
+ * @param {string} req.headers["authorization"] - Nagłówek autoryzacji, zawierający token JWT w formacie "Bearer &lt;token>".
+ * @param {Object} res - Obiekt odpowiedzi.
+ * @param {function} next - Funkcja, która przekazuje kontrolę do kolejnego middleware.
+ * @returns {Object} - Zwraca odpowiedź HTTP z kodem błędu, jeśli token jest nieważny lub wygasł.
+ * @throws {Error} - Zgłasza wyjątek, jeśli wystąpi błąd podczas weryfikacji tokenu.
+ */
+const authenticateToken = async (req, res, next) => {
+  const token = req.cookies.token;
+  if (!token) return res.status(401).json({ detail: "No token provided" });
+  try {
+    const payload = jwt.verify(token, process.env.SECRET_KEY);
+    const [user] = await getUserById(payload.user_id);
+
+    if (!user) {
+      return res.status(401).json({ detail: "User not found" });
+    }
+    
+    req.user = {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      login: user.login,
+      password: user.password,
+    };
+
+    next();
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({ detail: "Token has expired" });
+    }
+    if (err.name === "JsonWebTokenError") {
+      return res.status(401).json({ detail: "Invalid token" });
+    }
+    return res.status(500).json({ detail: "Internal server error" });
+  }
+};
+
+module.exports = { authenticateToken, SECRET_KEY: process.env.SECRET_KEY, TOKEN_EXPIRATION_MINUTES: process.env.TOKEN_EXPIRATION_MINUTES };
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.4</a> on Tue May 06 2025 14:13:18 GMT+0000 (Coordinated Universal Time) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
