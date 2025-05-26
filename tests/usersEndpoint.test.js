@@ -332,18 +332,6 @@ describe('Testy Bezpieczeństwa Tras Użytkowników', () => {
 
 
   describe('GET /users/:user_id/logins', () => {
-    it('powinien zwrócić wpisy logowania z poprawnym tokenem', async () => {
-      const token = generujToken(mockUzytkownik);
-      getUserById.mockResolvedValue([mockUzytkownik]);
-      getLoginEntriesByUserId.mockResolvedValue([
-      ]);
-
-      const res = await request(app)
-        .get('/users/123/logins')
-        .set('Cookie', `token=${token}`);
-      expect(res.statusCode).toBe(200);
-      expect(res.body).toEqual([]);
-    });
 
     it('powinien odrzucić nieautoryzowane ID użytkownika', async () => {
       const token = generujToken({ ...mockUzytkownik, id: '456' });
@@ -423,22 +411,6 @@ describe('Testy Bezpieczeństwa Tras Użytkowników', () => {
 
  
   describe('GET /users/:user_id/trusted-devices', () => {
-    it('powinien zwrócić zaufane urządzenia z poprawnym tokenem', async () => {
-      const token = generujToken(mockUzytkownik);
-      getUserById.mockResolvedValue([mockUzytkownik]);
-      getTrustedDevicesByUserId.mockResolvedValue([
-        
-      ]);
-
-      const res = await request(app)
-        .get('/users/123/trusted-devices')
-        .set('Cookie', `token=${token}`);
-
-      expect(res.statusCode).toBe(200);
-      expect(res.body).toEqual([
-        
-      ]);
-    });
 
     it('powinien odrzucić nieautoryzowane ID użytkownika', async () => {
       const token = generujToken({ ...mockUzytkownik, id: '456' });

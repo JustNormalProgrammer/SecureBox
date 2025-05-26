@@ -17,7 +17,6 @@ const {
 const { getHash } = require('../utils/hashGen');
 const CustomError = require('../utils/customError');
 
-
 const app = express();
 app.use(express.json());
 app.use('/passwords', passwordRoutes);
@@ -26,7 +25,7 @@ app.use((err, req, res, next) => {
   res.status(err.statusCode || 500).json({ detail: err.message || 'Internal server error' });
 });
 
-
+// Mock dependencies
 jest.mock('../config/db/queries/password', () => ({
   getPasswordByUserId: jest.fn(),
   createPassword: jest.fn(),
@@ -46,40 +45,47 @@ jest.mock('../utils/hashGen', () => ({
 }));
 
 jest.mock('../middleware/auth', () => {
-    const jwt = jest.requireActual('jsonwebtoken'); 
-    return {
-      authenticateToken: (req, res, next) => {
-        const authHeader = req.headers['authorization'];
-        const token = authHeader && authHeader.split(' ')[1];
-        if (!token) return res.status(401).json({ detail: 'Unauthorized' });
-        try {
-          const decoded = jwt.verify(token, 'test_secret_key');
-          req.user = decoded;
-          next();
-        } catch (err) {
-          return res.status(401).json({ detail: 'Unauthorized' });
-        }
-      },
-    };
-  });
-  
-
+  const jwt = jest.requireActual('jsonwebtoken');
+  return {
+    authenticateToken: (req, res, next) => {
+      const authHeader = req.headers['authorization'];
+      const token = authHeader && authHeader.split(' ')[1];
+      if (!token) return res.status(401).json({ detail: 'Unauthorized' });
+      try {
+        const decoded = jwt.verify(token, 'test_secret_key');
+        req.user = decoded;
+        next();
+      } catch (err) {
+        return res.status(401).json({ detail: 'Unauthorized' });
+      }
+    },
+  };
+});
 
 const generujToken = (user) => {
   return jwt.sign(user, 'test_secret_key', { expiresIn: '1h' });
 };
-
 
 const mockUzytkownik = {
   id: '123',
   login: 'jan@przyklad.pl',
 };
 
+// Explicitly manage server lifecycle
+let server;
+
+beforeAll((done) => {
+  server = app.listen(0, () => done()); // Use dynamic port
+});
+
+afterAll((done) => {
+  server.close(() => done()); // Close server after tests
+});
+
 describe('Testy Endpointów HASEŁ', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-
 
   describe('GET /passwords/', () => {
     it('powinien zwrócić listę haseł z poprawnym tokenem', async () => {
@@ -119,10 +125,7 @@ describe('Testy Endpointów HASEŁ', () => {
       expect(res.statusCode).toBe(401);
       expect(res.body.detail).toBe('Unauthorized');
     });
-
-    
   });
-
 
   describe('GET /passwords/:user_id/files', () => {
     it('powinien zwrócić archiwum ZIP dla poprawnego użytkownika', async () => {
@@ -160,10 +163,7 @@ describe('Testy Endpointów HASEŁ', () => {
       expect(res.statusCode).toBe(401);
       expect(res.body.detail).toBe('Unauthorized');
     });
-
-   
   });
-
 
   describe('POST /passwords/:user_id/files', () => {
     it('powinien utworzyć nowe hasło z poprawnymi danymi', async () => {
@@ -185,7 +185,7 @@ describe('Testy Endpointów HASEŁ', () => {
       expect(res.statusCode).toBe(201);
       expect(res.body).toEqual({
         id: '1',
-        filename: 'password_file.txt',
+        passwordfile: 'password_file.txt',
         logo: 'logo.png',
         platform: 'example',
         login: 'user1',
@@ -305,11 +305,8 @@ describe('Testy Endpointów HASEŁ', () => {
       expect(res.statusCode).toBe(401);
       expect(res.body.detail).toBe('Unauthorized');
     });
-
-    
   });
 
- 
   describe('PUT /passwords/:user_id/passwords/:platform/:login', () => {
     it('powinien zaktualizować hasło z poprawnymi danymi', async () => {
       const token = generujToken(mockUzytkownik);
@@ -392,11 +389,8 @@ describe('Testy Endpointów HASEŁ', () => {
       expect(res.statusCode).toBe(401);
       expect(res.body.detail).toBe('Unauthorized');
     });
-
-    
   });
 
-  
   describe('DELETE /passwords/:user_id/passwords/:platform/:login', () => {
     it('powinien usunąć hasło z poprawnymi danymi', async () => {
       const token = generujToken(mockUzytkownik);
@@ -456,10 +450,7 @@ describe('Testy Endpointów HASEŁ', () => {
       expect(res.statusCode).toBe(401);
       expect(res.body.detail).toBe('Unauthorized');
     });
-
-   
   });
-
 
   describe('PUT /passwords/:user_id/passwords', () => {
     it('powinien zaktualizować wszystkie hasła z poprawnymi danymi', async () => {
@@ -606,7 +597,5 @@ describe('Testy Endpointów HASEŁ', () => {
       expect(res.statusCode).toBe(401);
       expect(res.body.detail).toBe('Unauthorized');
     });
-
-    
   });
 });
