@@ -12,6 +12,14 @@ const app = express();
 
 const envtype = process.env.NODE_ENV || 'development';
 const isProduction = envtype === 'production';
+if (isProduction) {
+const logDirectory = '/app/source/files';
+const path = require('path');
+const morgan = require('morgan');
+const accessLogStream = fs.createWriteStream(path.join(logDirectory, 'access.log'), { flags: 'a' });
+app.use(morgan('combined', { stream: accessLogStream }));
+
+}
 const csrfSecret = process.env.CSRF_SECRET
 const allowedOrigins = [
   'https://orange-ground-00ae1ad03.6.azurestaticapps.net',
