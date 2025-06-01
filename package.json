@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon app.js",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "backup": "node backup.js"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +25,7 @@
     "express-validator": "^7.2.1",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
+    "node-cron": "^4.1.0",
     "nodemailer": "^6.10.0",
     "pg": "^8.14.1",
     "save-dev": "^0.0.1-security",

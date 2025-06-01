@@ -1,4 +1,5 @@
-const express = require('express');
+ express = require('express');
+ require('./backup');
 const cors = require('cors');
 const helmet = require('helmet');
 const authRoutes = require('./routes/auth');
